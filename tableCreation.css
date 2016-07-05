@@ -38,3 +38,11 @@ td {
 	padding: 1px 4px;
 }
 
+tfoot td {
+	border-top: 2px solid black;
+	margin-top: 3px;
+}
+
+tbody tr:nth-child(2n+1) {
+	background: #EEE;
+}
