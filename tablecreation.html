@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf8">
+	<link rel="stylesheet" href="../Libraries/bootstrap.min.css"/>
+	<link rel="stylesheet" href="tableCreation.css"/>
+</head>
+<body>
+    <div class="container">
+        <div class="jumbotron"></div>
+        <div class="row">
+            <div class="col col-md-12" id="container"></div>
+        </div>
+    </div>
+
+	<script type="text/javascript" src="../Libraries/jquery-1.10.2.js"></script>
+	<script type="text/javascript" src="../Libraries/bootstrap.min.js"></script>
+	<script type="text/javascript" src="tablecreation.js"></script>
+	<script type="text/javascript" src="data.js"></script>
+	<script>
+        $(document).ready( function() {
+            tableC.buildTable({ 
+                data: data, 
+                el: document.querySelector("#container")
+            });
+        });
+	</script>
+</body>
+</html>
