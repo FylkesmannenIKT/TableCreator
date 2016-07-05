@@ -1,5 +1,6 @@
 table {
 	width: 100%;
+	overflow-wrap: break-word;
 }
 
 table,td {
@@ -20,7 +21,15 @@ th:last-child {
 	border-right: 1px solid black;
 }
 
-td:not(:first-child) {
+.tcLeftAlign {
+	text-align: left;
+}
+
+.tcCenterAlign {
+	text-align: center;
+}
+
+td {
 	text-align: center;
 }
 

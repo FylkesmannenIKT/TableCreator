@@ -1,12 +1,34 @@
+"use strict";
+
+String.prototype.isNumeric = function() {
+    return !isNaN(parseFloat(this)) && isFinite(this);
+}
+
+Array.prototype.clean = function() {
+    for(var i = 0; i < this.length; i++) {
+        if(this[i] === "") {
+            this.splice(i, 1);
+        }
+    }
+    return this;
+}
+
 var tableC = {};
 
 tableC.methods = {
   "sum" : function(args) {
     var total = 0;
     for (var arg = 0; arg < args.length; ++arg) {
-      total += data.tbody[0][args[arg]];
+      total += parseFloat(args[arg]);
     }
     return total;
+  },
+  "avg" : function(args) {
+    var total = 0;
+    for (var arg = 0; arg < args.length; ++arg) {
+        total += parseFloat(args[arg]);
+    }
+    return (total / args.length)
   }
 };
 
@@ -43,39 +65,44 @@ tableC.buildTable = function (args) {
     html += '</tr>';
 
     html += '</thead><tbody>';
-    for (var line = 0; line < data.tbody.length; ++line) {
+    for (var line = 0; line < data.tbody.length; ++line)
+    {
         var dataLine = data.tbody[line];
         html += '<tr>';
 
 		var column = data.thead.cols;
 
-        for (var x = 0; x < column.length; ++x) {
+        for (var x = 0; x < column.length; ++x)
+        {
         	var id = column[x].id;
             var value = dataLine.hasOwnProperty(id) ? dataLine[id] : "";
             var cls = column[x].hasOwnProperty("class") ? column[x].class : "";
         	var clsAttr = column[x].hasOwnProperty("class") ? ' class="' + column[x].class + '"' : '';
-            if(!column[x].hasOwnProperty("type") || column[x].type === "string"){
-        		html += '<td' + clsAttr + '>' + value + '</td>';
+        	if (column[x].hasOwnProperty("method"))
+            {
+                var method = column[x].method;
+                var answer = tableC.parseMethod(method, dataLine);
+                html += '<td class="' + cls + '">' + answer + '</td>';
+
+            } 
+            else if (column[x].hasOwnProperty("type"))
+            {
+            	switch(column[x].type)
+                {
+            		case 'method':
+            			html += '<td class="' + column[x].type + ' ' + cls + '">' + tableC.parseMethod(value, dataLine) + '</td>';
+            			break;
+            		case 'string':
+            		case 'undefined':
+		                html += '<td class="tcLeftAlign ' + column[x].type + ' ' + cls + '">' + value + '</td>';
+            			break;
+            		default:
+		                html += '<td class="' + column[x].type + ' ' + cls + '">' + value + '</td>';
+            	}
         	} 
-            else if (column[x].hasOwnProperty("method")) {
-    			var method = column[x].method;
-    			var methodCall = method.substr(0, method.indexOf('('));
-    			var columnString = method.substring(method.lastIndexOf('(')+1, method.lastIndexOf(')'));
-    			var columns = columnString.split(',');
-
-    			var answer = NaN;
-    			if(tableC.methods.hasOwnProperty(methodCall)) {
-    				var call = tableC.methods[methodCall];
-    				console.log(call);
-    				answer = call(columns);
-    			}
-
-    			html += '<td class="' + methodCall + ' ' + cls + '">' + answer + '</td>';
-
-            } else if (column[x].hasOwnProperty("type")) {
-                html += '<td class="' + column[x].type + ' ' + cls + '">' + dataLine[id] + '</td>';
-        	} else {
-        		html += '<td' + clsAttr + '></td>'
+            else
+            {
+        		html += '<td class="tcLeftAlign ' + cls + '"></td>'
         	}
         }
 
@@ -84,4 +111,56 @@ tableC.buildTable = function (args) {
     html += '</tbody>' + '</table>';
 
     el.innerHTML = html;
+}
+
+tableC.parseMethod = function(methodString, rowItem) {
+    var parts = methodString.replace(/\s+/g, "");
+    console.log(parts);
+    var parts = parts.split(/([\,\(\)])/).clean();
+    console.log(parts);
+
+    var argArrayStack = [[]];
+    var operatorStack = [];
+
+    for (var x = 0; x < parts.length; ++x) {
+        var token = parts[x];
+
+        // methods
+        if (tableC.methods.hasOwnProperty(token)) {
+            operatorStack.push(token);
+        }
+        // scope
+        else if (token === '(') {
+            argArrayStack.push([]);
+        }
+        // column name
+        else if (rowItem.hasOwnProperty(token)) {
+            argArrayStack[argArrayStack.length-1].push(rowItem[token]);
+        }
+        // negative values
+        else if (token.charAt(0) === '-' && rowItem.hasOwnProperty(token.slice(1))) {
+            argArrayStack[argArrayStack.length-1].push(-rowItem[token.slice(1)]);
+        }
+        // numbers
+        else if (token.isNumeric()) {
+            argArrayStack[argArrayStack.length-1].push(parseFloat(token));
+        }
+        // end of scope
+        else if (token === ')') {
+            var args = argArrayStack.pop();
+            var call = operatorStack.pop();
+            var result = tableC.methods[call](args); 
+            argArrayStack[argArrayStack.length-1].push(result);
+            console.log("args: " + args + ", call: " + call);
+            console.log(result);
+        }
+
+    }
+    console.log("operatorStack: " + operatorStack);
+    console.log("argArrayStack: " + argArrayStack);
+
+    var value = parseFloat(argArrayStack.pop()).toFixed(2);
+    console.log(value);
+    value = isNaN(value) ? "" : value;
+    return value;
 }

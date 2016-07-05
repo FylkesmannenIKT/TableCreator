@@ -4,8 +4,7 @@ var data = {
 		"cols": [{
 			"id":"beskrivelse",
 			"title":"",
-			"class":"",
-			"method":""
+			"type": "string"
 		},{
 			"id":"aar",
 			"title":"År",
