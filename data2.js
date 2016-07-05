@@ -28,11 +28,6 @@ var data = {
 			"title":"Regnskap 2015",
 			"type":"number"
 		},{
-			"id":"test",
-			"title":"Test calc",
-			"type":"number",
-			"method": "sum(post,utgiftskapittel)"
-		},{
 			"id":"merutgift",
 			"title":"Merutgift(-) og mindreutgift",
 			"type":"method"
