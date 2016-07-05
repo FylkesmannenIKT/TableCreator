@@ -76,6 +76,9 @@ tableC.buildTable = function (args) {
                     case 'undefined':
                         html += '<td class="tcLeftAlign ' + column[x].type + ' ' + cls + '">' + value + '</td>';
                         break;
+                    case 'index':
+                        html += '<td>' + (line+1) + '</td>';
+                        break;
                     default:
                         html += '<td class="' + column[x].type + ' ' + cls + '">' + value + '</td>';
                 }
@@ -98,7 +101,7 @@ tableC.buildTable = function (args) {
                 html += '<td>' + fCol.title + '</td>';
             }
             else if (fCol.hasOwnProperty("method")) {
-                html += '<td>' + tableC.parseColumnMethod(fCol.method, data) + '</td>';
+                html += '<td>' + tableC.parseMethod(fCol.method, data) + '</td>';
             }
             else {
                 html += '<td></td>';
@@ -128,14 +131,59 @@ tableC.methods = {
   }
 };
 
-tableC.parseColumnMethod = function(methodString, data) {
-    var parts = methodString.replace(/\s+/g, "");
-    parts = parts.split(/([\,\(\)])/).clean();
-    console.log(data);
-    return methodString;
+tableC.calculate = function(method, paramArray, data) {
+    var args = [];
+    var result;
+    if (data.hasOwnProperty("tbody")) {
+        for (var i = 0; i < paramArray.length; ++i) {
+            var param = paramArray[i];
+            if (typeof param === 'number') {
+                args.push((minus)?-param:param);
+                continue;
+            }
+            var minus = false;
+            if(typeof param === 'string' && param.charAt(0) === '-') {
+                minus = true;
+                param = param.slice(1);
+            }
+            for (var j = 0; j < data.tbody.length; ++j) {
+                var row = data.tbody[j];
+                if (row.hasOwnProperty(param)) {
+
+                    var colHead = null;
+                    for (var t = 0; t < data.thead.cols.length; ++t) {
+                        colHead = data.thead.cols[t];
+                        if(colHead.id === param) { break; }
+                    }
+                    if (colHead.type === "method") {
+                        var methodResult = tableC.parseMethod(row[param], row);
+                        args.push((minus)?-methodResult:methodResult);                        
+                    } else if (colHead.type === "number") {
+                        args.push((minus)?-row[param]:row[param]);
+                    }
+                }
+            }
+        }
+        result = tableC.methods[method](args);
+    } else {
+        for (var k = 0; k < paramArray.length; ++k) {
+            var item = paramArray[k];
+            if(typeof item === 'number') {
+                args.push(item);
+            }
+            else if(data.hasOwnProperty(item)) {
+                args.push(data[item]);
+            }
+            else if(item.charAt(0) === '-' && data.hasOwnProperty(item.slice(1))) {
+                args.push(-data[item.slice(1)]);
+            }
+        }
+        result = tableC.methods[method](args);
+    }
+    return result;
 };
 
-tableC.parseMethod = function(methodString, rowItem) {
+tableC.parseMethod = function(methodString, data) {
     var parts = methodString.replace(/\s+/g, "");
     parts = parts.split(/([\,\(\)])/).clean();
 
@@ -144,7 +192,6 @@ tableC.parseMethod = function(methodString, rowItem) {
 
     for (var x = 0; x < parts.length; ++x) {
         var token = parts[x];
-
         // methods
         if (tableC.methods.hasOwnProperty(token)) {
             operatorStack.push(token);
@@ -152,14 +199,6 @@ tableC.parseMethod = function(methodString, rowItem) {
         // scope
         else if (token === '(') {
             argArrayStack.push([]);
-        }
-        // column name
-        else if (rowItem.hasOwnProperty(token)) {
-            argArrayStack[argArrayStack.length-1].push(rowItem[token]);
-        }
-        // negative values
-        else if (token.charAt(0) === '-' && rowItem.hasOwnProperty(token.slice(1))) {
-            argArrayStack[argArrayStack.length-1].push(-rowItem[token.slice(1)]);
         }
         // numbers
         else if (token.isNumeric()) {
@@ -169,10 +208,13 @@ tableC.parseMethod = function(methodString, rowItem) {
         else if (token === ')') {
             var args = argArrayStack.pop();
             var call = operatorStack.pop();
-            var result = tableC.methods[call](args);
+            var result = tableC.calculate(call, args, data);
             argArrayStack[argArrayStack.length-1].push(result);
         }
-
+        // arguments
+        else if (token !== ',') {
+            argArrayStack[argArrayStack.length-1].push(token);
+        }
     }
 
     var value = parseFloat(argArrayStack.pop()).toFixed(0);

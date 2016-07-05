@@ -1,7 +1,11 @@
 var data = {
 	"thead": {
-		"rows": [[{"title":"Oppstilling av Bevilgningsrapportering, 31.12.2015", "colspan": 8 }]],
+		"rows": [[{"title":"Oppstilling av Bevilgningsrapportering, 31.12.2015", "colspan": 9 }]],
 		"cols": [{
+			"id":"id",
+			"title": "ID",
+			"type": "index"
+		},{
 			"id":"utgiftskapittel",
 			"title":"Utgiftskapittel",
 			"class": "tcCenterAlign",
@@ -31,17 +35,25 @@ var data = {
 			"id":"merutgift",
 			"title":"Merutgift(-) og mindreutgift",
 			"type":"method"
+		},{
+			"id":"utgift",
+			"title":"Utgift",
+			"type":"number",
+			"method": "sum(tildeling,-regnskap)"
 		}]
 	},
 	"tfoot": {
 		"cols": [
-			{"title": "I snitt"},
+			{},
+			{"title": "Totaler:"},
 			{},
 			{"method": "avg()"},
-			{"method": "avg()"},
-			{"method": "avg()"},
-			{"method": "avg()"},
-			{"method": "avg()"}
+			{"method": ""},
+			{"method": "sum(tildeling)"},
+			{"method": "sum(regnskap)"},
+			{"method": "sum(merutgift)"},
+			{"method": ""},
+			{"method": "sum(-tildeling,regnskap,avg(tildeling,-regnskap))"}
 		]
 	},
 	"tbody": [
@@ -52,8 +64,7 @@ var data = {
 			"posttekst": "Driftsutgifter",
 			"tildeling": 78633000,
 			"regnskap": 77994835,
-			"merutgift": "avg(sum(tildeling,-regnskap,avg(tildeling,regnskap),sum(tildeling,regnskap)),382.9,sum(8,8))"
-
+			"merutgift": "sum(tildeling,-regnskap)"
 		},{
 			"utgiftskapittel": "0525",
 			"kapittelnavn": "Fylkesmannsembetene - spes. driftsutgifter",
@@ -76,6 +87,7 @@ var data = {
 			"posttekst": "Spesielle driftsutgifter",
 			"tildeling": 1190000,
 			"regnskap": 1071134
+			// "merutgift": "avg(sum(tildeling,-regnskap,avg(tildeling,regnskap),sum(tildeling,regnskap)),382.9,sum(8,8))"
 		}
 	]
 };
