@@ -21,15 +21,15 @@ th:last-child {
 	border-right: 1px solid black;
 }
 
-.tcLeftAlign {
-	text-align: left;
+td.tcRightAlign {
+	text-align: right;
 }
 
-.tcCenterAlign {
-	text-align: center;
+td.tcBold {
+	font-weight: bold;
 }
 
-td {
+td.tcCenterAlign {
 	text-align: center;
 }
 
@@ -45,4 +45,12 @@ tfoot td {
 
 tbody tr:nth-child(2n+1) {
 	background: #EEE;
+}
+
+.string {
+	text-align: left;
+}
+
+.number {
+	text-align: center;
 }

@@ -61,8 +61,9 @@ tableC.buildTable = function (args) {
             if (column[x].hasOwnProperty("method"))
             {
                 var method = column[x].method;
+                var type = column[x].hasOwnProperty("type") ? column[x].type : '';
                 var answer = tableC.parseMethod(method, dataLine);
-                html += '<td class="' + cls + '">' + answer + '</td>';
+                html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
 
             }
             else if (column[x].hasOwnProperty("type"))
@@ -97,11 +98,13 @@ tableC.buildTable = function (args) {
         for (var y = 0; y < data.tfoot.cols.length; ++y)
         {
             var fCol = data.tfoot.cols[y];
+            var globalClass = data.thead.cols[y].hasOwnProperty("class") ? data.thead.cols[y].class : '';
+            var localClass = fCol.hasOwnProperty("class") ? fCol.class : '';
             if(fCol.hasOwnProperty("title")) {
-                html += '<td>' + fCol.title + '</td>';
+                html += '<td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '</td>';
             }
             else if (fCol.hasOwnProperty("method")) {
-                html += '<td>' + tableC.parseMethod(fCol.method, data) + '</td>';
+                html += '<td class="' + globalClass + ' ' + localClass + ' number">' + tableC.parseMethod(fCol.method, data) + '</td>';
             }
             else {
                 html += '<td></td>';
