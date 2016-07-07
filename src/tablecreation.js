@@ -98,7 +98,10 @@ tableC.buildTable = function (args) {
         for (var y = 0; y < data.tfoot.cols.length; ++y)
         {
             var fCol = data.tfoot.cols[y];
-            var globalClass = data.thead.cols[y].hasOwnProperty("class") ? data.thead.cols[y].class : '';
+            var globalClass = '';
+            if(y < data.thead.cols.length) {
+                globalClass = data.thead.cols[y].hasOwnProperty("class") ? data.thead.cols[y].class : '';
+            }
             var localClass = fCol.hasOwnProperty("class") ? fCol.class : '';
             if(fCol.hasOwnProperty("title")) {
                 html += '<td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '</td>';

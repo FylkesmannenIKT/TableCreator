@@ -1,0 +1,25 @@
+{
+  "name": "tablecreation",
+  "version": "1.0.0",
+  "description": "A javascript application for tranforming a specific json structure to a table.",
+  "main": "tablecreation.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "."
+  },
+  "keywords": [
+    "json",
+    "table",
+    "js"
+  ],
+  "author": "Per Kristian Warvik",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-cssmin": "^1.0.1",
+    "grunt-contrib-uglify": "^1.0.1"
+  }
+}
