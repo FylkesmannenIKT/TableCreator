@@ -1,6 +1,14 @@
 var data = {
 	"thead": {
-		"rows": [[{},{},{"title":"Kjønnsbalanse", "colspan": 3 },{"title": "Månedslønn heltidsekvivalent", "colspan":2}]],
+		"rows": [
+			[{},{},{
+				"title":"Kjønnsbalanse", 
+				"colspan": 3 
+			},{
+				"title": "Månedslønn heltidsekvivalent", 
+				"colspan":2
+			}]
+		],
 		"cols": [{
 			"id":"beskrivelse",
 			"title":"",
@@ -36,11 +44,11 @@ var data = {
 		"cols": [
 			{"title": "I snitt"},
 			{},
+			{"method": "avg(manndel)"},
+			{"method": "avg(kvinnedel)"},
+			{"method": "avg(mkTotal)"},
 			{"method": "avg()"},
-			{"method": "avg()"},
-			{"method": "avg()"},
-			{"method": "avg()"},
-			{"method": "avg()"}
+			{"method": "avg(kvinneKrProsent)"}
 		]
 	},
 	"tbody": [

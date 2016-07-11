@@ -22,13 +22,23 @@ module.exports = function(grunt) {
           'build/<%= pkg.name %>.min.css': [ 'src/<%= pkg.name %>.css' ]
         }
       }
+    },
+    jsdoc: {
+      dist: {
+        src: ['src/*.js'],
+        options: {
+          destination: 'doc',
+          verbose: true
+        }
+      }
     }
   });
 
-  // Load the plugin that provides the "uglify" task.
+  // Load the plugins that provides the tasks.
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-jsdoc');
 
   // Default task(s).
-  grunt.registerTask('default', ['uglify','cssmin']);
+  grunt.registerTask('default', ['uglify','cssmin','jsdoc']);
 };

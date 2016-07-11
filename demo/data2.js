@@ -47,12 +47,12 @@ var data = {
 			{},
 			{"title": "Totaler:"},
 			{},
-			{"method": "avg()"},
-			{"method": ""},
+			{},
+			{},
 			{"method": "sum(tildeling)"},
 			{"method": "sum(regnskap)"},
 			{"method": "sum(merutgift)"},
-			{"method": ""},
+			{},
 			{"method": "sum(-tildeling,regnskap,avg(tildeling,-regnskap))"}
 		]
 	},

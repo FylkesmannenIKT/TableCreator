@@ -3,14 +3,12 @@ table {
 	overflow-wrap: break-word;
 }
 
-table,td {
+table {
 	border: 1px solid black;
 }
 
 th {
 	text-align: center;
-	border-right: 1px solid #ccc;
-	border-left: 1px solid #ccc;
 }
 
 th:first-child {
@@ -51,6 +49,12 @@ tbody tr:nth-child(2n+1) {
 	text-align: left;
 }
 
+.method,
 .number {
-	text-align: center;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.minus {
+	color: red;
 }
