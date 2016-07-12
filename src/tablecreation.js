@@ -36,7 +36,11 @@ var tableC = {
      * @memberOf tableC
      */
     buildTable: function (data, el) {
-        var html = '<table class="data_table"><thead>';
+        var tableClass = '';
+        if(data.hasOwnProperty("table")) {
+            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : '';
+        }
+        var html = '<table class="data_table ' + tableClass + '"><thead>';
 
         /**
          * Iterate over rows in data.thead to create headings in the table
@@ -48,7 +52,7 @@ var tableC = {
                 var hrColumn = rowList[hrCol];
                 var colspan = hrColumn.hasOwnProperty("colspan") ? ' colspan="' + hrColumn.colspan + '"' : '';
                 var title = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
-                html += '<th ' + colspan + '>' + title + '</th>';
+                html += '<th class="tcTableHeaders" ' + colspan + '>' + title + '</th>';
             }
             html += '</tr>';
         }
@@ -60,7 +64,8 @@ var tableC = {
         for (var col = 0; col < data.thead.cols.length; ++col) {
             var headerRow = data.thead.cols[col];
             var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : null;
-            html += '<th>' + headerTitle + '</th>';
+            var hClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
+            html += '<th class="' + hClass + '">' + headerTitle + '</th>';
         }
         html += '</tr>';
 
@@ -107,6 +112,20 @@ var tableC = {
                         case 'index':
                             html += '<td>' + (line+1) + '</td>';
                             break;
+                        case 'actionArray':
+                            html += '<td class="tcRightAlign ' + cls + '">';
+                            var actions = column[x].hasOwnProperty("actions") ? column[x].actions : null;
+                            if(actions !== null && actions.constructor === Array ) {
+                                for(var a = 0; a < actions.length; ++a) {
+                                    switch(actions[a]) {
+                                        case 'edit':
+                                            html += '<span class="edit">rediger</span>';
+                                            break;
+                                    }
+                                }
+                            }
+                            html += '</td>';
+                            break;
                         default:
                             html += '<td class="' + column[x].type + ' ' + cls + '">' + value + '</td>';
                     }
@@ -116,6 +135,8 @@ var tableC = {
                     html += '<td class="tcLeftAlign ' + cls + '"></td>';
                 }
             }
+
+            // html += '<td><span class="edit">rediger</span></td>';
 
             html += '</tr>';
         }
@@ -143,7 +164,7 @@ var tableC = {
                     html += '<td class="' + globalClass + ' ' + localClass + ' number">' + tableC.formatData(footValue, 'number') + '</td>';
                 }
                 else {
-                    html += '<td></td>';
+                    html += '<td class="' + globalClass + '"></td>';
                 }
             }
             html += '</tfoot></tr>';
@@ -260,6 +281,7 @@ var tableC = {
                             var methodResult = tableC.parseMethod(row[param], row);
                             args.push((minus)?-methodResult:methodResult);   
                         } else if (colHead.hasOwnProperty("method")) {
+                            alert(JSON.stringify(colHead));
                             // var methodResult = tableC.parsemethod();
                         } else if (colHead.type === "number") {
                             args.push((minus)?-row[param]:row[param]);

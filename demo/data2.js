@@ -35,11 +35,6 @@ var data = {
 			"id":"merutgift",
 			"title":"Merutgift(-) og mindreutgift",
 			"type":"method"
-		},{
-			"id":"utgift",
-			"title":"Utgift",
-			"type":"number",
-			"method": "sum(tildeling,-regnskap)"
 		}]
 	},
 	"tfoot": {
@@ -52,8 +47,6 @@ var data = {
 			{"method": "sum(tildeling)"},
 			{"method": "sum(regnskap)"},
 			{"method": "sum(merutgift)"},
-			{},
-			{"method": "sum(-tildeling,regnskap,avg(tildeling,-regnskap))"}
 		]
 	},
 	"tbody": [

@@ -11,12 +11,21 @@ th {
 	text-align: center;
 }
 
-th:first-child {
+/*th:first-child {
 	border-left: 1px solid black;
 }
 
 th:last-child {
 	border-right: 1px solid black;
+}
+
+td:last-child {
+	border-right: 1px solid black;
+}*/
+
+th.tcTableHeaders {
+	text-align: left;
+	padding: 5px;
 }
 
 td.tcRightAlign {
@@ -55,6 +64,48 @@ tbody tr:nth-child(2n+1) {
 	white-space: nowrap;
 }
 
+.numberCenter .number {
+	text-align: center;
+}
+
 .minus {
 	color: red;
+}
+
+.edit {
+	cursor: pointer;
+	vertical-align: middle;
+	/*background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAKgAAACoBIzn83AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADzSURBVDiNndQ9SgNBGAbgJ41a+XcEvYkWdsE7aCEIAX+wUgvBA9jkDB5ATBWtBEUURPAUErCwCKJrMbOwGcIyk4Wp9pvn+94Zdil/evjEAEsz7AenqBrrFaulyBrGCVThAYudTOQAb0KUa8wl729ykOPY+Rsb2J4y2SgXecZtxDYT7A97bch5LLzHZaP7GF1sRXg3Z5InnMWuzSj1ZOttyFEsfhSuO0XqOPs5ce5wMQWo8IudHGRo8kyKkMNY+IKTlji9HOQdX7Mi8COcyXwjXjFCyH2FFXRMfpjZSA3VG5exgI9SJIX6QsxihPCTGiWrGPkHcNF50wP/KrYAAAAASUVORK5CYII=');*/
+	opacity: 1;
+
+	font: normal normal normal 14px/1 FontAwesome;
+
+	-webkit-box-sizing: content-box;
+	box-sizing: content-box;
+
+	display: inline-block;
+	width: 18px;
+	height: 18px;
+	margin: 6px;
+	padding: 0;
+	overflow: hidden;
+	background-repeat: no-repeat;
+	font-size: 18px;
+	-ms-high-contrast-adjust: none;
+}
+
+.edit:before {
+	content: "\f040";
+	padding-right: 1em;
+}
+
+@media print {
+  .tc-hidden-print {
+    width: 1px;
+    overflow: hidden;
+  }
+
+  .tc-hidden-print * {
+  	display: none;
+  }
 }
