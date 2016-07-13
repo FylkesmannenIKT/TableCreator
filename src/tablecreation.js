@@ -27,6 +27,10 @@ Array.prototype.clean = function() {
  */
 var tableC = {
 
+    settings: {
+        precision: 2
+    },
+
     /** 
      * Building a html table from data and put it the given element.
      *
@@ -40,6 +44,17 @@ var tableC = {
         if(data.hasOwnProperty("table")) {
             tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : '';
         }
+
+        if (data.hasOwnProperty("table")) {
+            if (data.table.hasOwnProperty("settings")) {
+                if (data.table.settings.hasOwnProperty("decimals")) {
+                    if (typeof data.table.settings.decimals === 'number') {
+                        this.settings.precision = data.table.settings.decimals;
+                    }
+                }
+            }
+        }
+
         var html = '<table class="data_table ' + tableClass + '"><thead>';
 
         /**
@@ -254,37 +269,52 @@ var tableC = {
         var args = [];
         var result;
         if (data.hasOwnProperty("tbody")) {
+            var columns = data.thead.cols;
+            var rows = data.tbody;
             for (var i = 0; i < paramArray.length; ++i) {
                 var param = paramArray[i];
+                
+                // param is a number and can be calculated directly
                 if (typeof param === 'number') {
-                    args.push((minus)?-param:param);
+                    args.push(param);
                     continue;
                 }
+
                 var minus = false;
                 if(typeof param === 'string' && param.charAt(0) === '-') {
                     minus = true;
                     param = param.slice(1);
                 }
-                for (var j = 0; j < data.tbody.length; ++j) {
-                    var row = data.tbody[j];
+
+                // find column definition
+                var headObject = null;
+                for (var c = 0; c < columns.length; ++c) {
+                    if(columns[c].id === param) {
+                        headObject = columns[c];
+                        break;
+                    }
+                }
+
+                // param is a method at column level (colHeader, colDefinition)
+                if (headObject !== null && headObject.hasOwnProperty("method")) {
+                    var columnResult = tableC.parseMethod(headObject.method, data);
+                    args.push((minus) ? -columnResult : columnResult);
+                    continue;
+                }
+
+                for (var j = 0; j < rows.length; ++j) {
+                    var row = rows[j];
                     if (row.hasOwnProperty(param)) {
 
-                        var colHead = null;
-                        for (var t = 0; t < data.thead.cols.length; ++t) {
-                            colHead = data.thead.cols[t];
-                            if(colHead.id === param) { break; }
+                        // param is a method defined at row level
+                        if (headObject.type === "method") {
+                            var rowResult = tableC.parseMethod(row[param], row);
+                            args.push((minus)? -rowResult : rowResult);
                         }
-                        if (colHead === null) {
-                            debugger;
-                        }
-                        if (colHead.type === "method") {
-                            var methodResult = tableC.parseMethod(row[param], row);
-                            args.push((minus)?-methodResult:methodResult);   
-                        } else if (colHead.hasOwnProperty("method")) {
-                            alert(JSON.stringify(colHead));
-                            // var methodResult = tableC.parsemethod();
-                        } else if (colHead.type === "number") {
-                            args.push((minus)?-row[param]:row[param]);
+
+                        // param is a number at row level
+                        else if (headObject.type === "number") {
+                            args.push((minus) ? -row[param] : row[param]);
                         }
                     }
                 }
@@ -342,8 +372,8 @@ var tableC = {
             }
             // end of scope
             else if (token === ')') {
-                var args = argArrayStack.pop();
                 var call = operatorStack.pop();
+                var args = argArrayStack.pop();
                 var result = tableC.calculate(call, args, data);
                 argArrayStack[argArrayStack.length-1].push(result);
             }
@@ -353,7 +383,11 @@ var tableC = {
             }
         }
 
-        var value = parseFloat(argArrayStack.pop()).toFixed(0);
+        var precision = 2;
+        if (typeof this.settings.precision === 'number')
+            precision = this.settings.precision;
+
+        var value = parseFloat(argArrayStack.pop()).toFixed(precision);
         value = isNaN(value) ? "" : value;
         return value;
     }
