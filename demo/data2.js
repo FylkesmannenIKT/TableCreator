@@ -1,6 +1,6 @@
 var data = {
 	"thead": {
-		"rows": [[{"title":"Oppstilling av Bevilgningsrapportering, 31.12.2015", "colspan": 9 }]],
+		"rows": [[{"title":"Oppstilling av Bevilgningsrapportering, 31.12.2015", "colspan": 8 }]],
 		"cols": [{
 			"id":"id",
 			"title": "ID",
