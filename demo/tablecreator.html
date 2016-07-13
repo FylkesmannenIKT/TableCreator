@@ -3,8 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="../../Libraries/bootstrap.min.css"/>
-	<link rel="stylesheet" href="../../Libraries/font-awesome-4.6.3/css/font-awesome.css"/>
-	<link rel="stylesheet" href="../src/tablecreation.css"/>
+	<link rel="stylesheet" href="../src/tablecreator.css"/>
 </head>
 <body>
     <div class="container">
@@ -16,11 +15,11 @@
 
 	<script type="text/javascript" src="../../Libraries/jquery-1.10.2.js"></script>
 	<script type="text/javascript" src="../../Libraries/bootstrap.min.js"></script>
-	<script type="text/javascript" src="../src/tablecreation.js"></script>
-	<script type="text/javascript" src="data2.js"></script>
+	<script type="text/javascript" src="../src/tablecreator.js"></script>
+	<script type="text/javascript" src="data.js"></script>
 	<script>
         $(document).ready(function(){
-            tableC.buildTable(data, document.querySelector("#container"));
+            TableCreator(data, document.querySelector("#container")).build();
         });
 	</script>
 </body>

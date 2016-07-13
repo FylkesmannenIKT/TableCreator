@@ -1,8 +1,8 @@
 {
-  "name": "tablecreation",
+  "name": "tablecreator",
   "version": "1.0.0",
   "description": "A javascript application for tranforming a specific json structure to a table.",
-  "main": "tablecreation.js",
+  "main": "tablecreator.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

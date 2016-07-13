@@ -21,15 +21,45 @@ Array.prototype.clean = function() {
 };
 
 /**
- * tableC
+ * TableCreator
  * Object that holds all the methods for creating tables.
  * @class 
  */
-var tableC = {
+function TableCreator(data, el) {
 
-    settings: {
+    if (!(this instanceof TableCreator)) {
+        return new TableCreator(data, el);
+    }
+
+    /**
+     * Object containing json structure defining table with content.
+     * @memberOf TableCreator
+     */
+    this.data = data;
+
+    /**
+     * DOM element the generated table should be put into.
+     * @memberOf TableCreator
+     */
+    this.el = el;
+
+    /**
+     * Object containing settings.
+     * @memberOf TableCreator
+     */
+    this.settings = {
         precision: 2
-    },
+    };
+
+    /** 
+     * Building a html table from data the TableCreator has.
+     *
+     * @return void
+     * @memberOf TableCreator
+     */
+    this.build = function() {
+        this.buildTable(this.data, this.el);
+    }
 
     /** 
      * Building a html table from data and put it the given element.
@@ -37,9 +67,9 @@ var tableC = {
      * @param {object} data - The data structure with table structure and table data.
      * @param {object} args - The element where the finished table should be pasted to.
      * @return void
-     * @memberOf tableC
+     * @memberOf TableCreator
      */
-    buildTable: function (data, el) {
+    this.buildTable = function (data, el) {
         var tableClass = '';
         if(data.hasOwnProperty("table")) {
             tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : '';
@@ -55,7 +85,7 @@ var tableC = {
             }
         }
 
-        var html = '<table class="data_table ' + tableClass + '"><thead>';
+        var html = '<table class="tc_table ' + tableClass + '"><thead>';
 
         /**
          * Iterate over rows in data.thead to create headings in the table
@@ -104,8 +134,8 @@ var tableC = {
                 {
                     var method = column[x].method;
                     var type = column[x].hasOwnProperty("type") ? column[x].type : '';
-                    var answer = tableC.parseMethod(method, dataLine);
-                    answer = (type == 'number') ? tableC.formatData(answer, 'number') : answer;
+                    var answer = this.parseMethod(method, dataLine);
+                    answer = (type == 'number') ? this.formatData(answer, 'number') : answer;
                     html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
 
                 }
@@ -114,11 +144,11 @@ var tableC = {
                     switch(column[x].type)
                     {
                         case 'method':
-                            value = tableC.parseMethod(value, dataLine);
-                            html += '<td class="' + column[x].type + ' ' + cls + '">' + tableC.formatData(value, 'number') + '</td>';
+                            value = this.parseMethod(value, dataLine);
+                            html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'number') + '</td>';
                             break;
                         case 'number':
-                            html += '<td class="' + column[x].type + ' ' + cls + '">' + tableC.formatData(value, 'number') + '</td>';
+                            html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'number') + '</td>';
                             break;
                         case 'string':
                         case 'undefined':
@@ -175,8 +205,8 @@ var tableC = {
                     html += '<td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '</td>';
                 }
                 else if (fCol.hasOwnProperty("method")) {
-                    footValue = tableC.parseMethod(fCol.method, data);
-                    html += '<td class="' + globalClass + ' ' + localClass + ' number">' + tableC.formatData(footValue, 'number') + '</td>';
+                    footValue = this.parseMethod(fCol.method, data);
+                    html += '<td class="' + globalClass + ' ' + localClass + ' number">' + this.formatData(footValue, 'number') + '</td>';
                 }
                 else {
                     html += '<td class="' + globalClass + '"></td>';
@@ -187,19 +217,19 @@ var tableC = {
         html += '</table>';
 
         el.innerHTML = html;
-    },
+    };
 
     /**
      * Method to format values based on type
-     * @memberof tableC
+     * @memberof TableCreator
      * @param value A value that can be transformed
      * @param type The type that should determine how the value should be formatted
      * @returns A formatted string if formatting exists, else the original value
      * @example
      * // returns '15 000'
-     * tableC.formatData( 15000, 'number' );
+     * TableCreator.formatData( 15000, 'number' );
      */
-     formatData: function formatData(value, type) {
+     this.formatData = function formatData(value, type) {
         var val = value;
         switch(type) {
             case 'number':
@@ -213,18 +243,18 @@ var tableC = {
                 break;
         }
         return val;
-     },
+     };
 
     /**
      * Object containing arithmetic methods (method name as key and function([array of numbers]) as values).
-     * @memberOf tableC
+     * @memberOf TableCreator
      * @param {Array.<Number>}
      * @example
      * // returns 15
      * methods["sum"]([5,10]);
      * methods["avg"]([5,25]);
      */
-    methods: {
+    this.methods = {
       "sum" : function(args) {
         var total = 0;
         for (var arg = 0; arg < args.length; ++arg) {
@@ -239,7 +269,7 @@ var tableC = {
         }
         return (total / args.length);
       }
-    },
+    };
 
     /** 
      * Calculate an answer with a method, passing in parameters(numbers or properties in data).<br/>
@@ -257,15 +287,15 @@ var tableC = {
      *
      * @example
      * // returns 15
-     * tableC.calculate("sum", ['five', 10], {tbody:[{five:5}]});
+     * TableCreator.calculate("sum", ['five', 10], {tbody:[{five:5}]});
      *
-     * @param {string} method - a name of a calculation in tableC.methods
+     * @param {string} method - a name of a calculation in TableCreator.methods
      * @param {Array} paramArray - an array with numbers, keys or methods
      * @param {object} data - either a object found in tbody or a full data object with thead and tbody
      * @returns {Number} The final answer to the calculation.
-     * @memberOf tableC
+     * @memberOf TableCreator
      */
-    calculate: function(method, paramArray, data) {
+    this.calculate = function(method, paramArray, data) {
         var args = [];
         var result;
         if (data.hasOwnProperty("tbody")) {
@@ -297,7 +327,7 @@ var tableC = {
 
                 // param is a method at column level (colHeader, colDefinition)
                 if (headObject !== null && headObject.hasOwnProperty("method")) {
-                    var columnResult = tableC.parseMethod(headObject.method, data);
+                    var columnResult = this.parseMethod(headObject.method, data);
                     args.push((minus) ? -columnResult : columnResult);
                     continue;
                 }
@@ -308,7 +338,7 @@ var tableC = {
 
                         // param is a method defined at row level
                         if (headObject.type === "method") {
-                            var rowResult = tableC.parseMethod(row[param], row);
+                            var rowResult = this.parseMethod(row[param], row);
                             args.push((minus)? -rowResult : rowResult);
                         }
 
@@ -333,23 +363,23 @@ var tableC = {
                 }
             }
         }
-        result = tableC.methods[method](args);
+        result = this.methods[method](args);
         return result;
-    },
+    };
 
     /** 
      * Parse a method, pass it to calculation and return the answer.
      *
      * @example
      * // returns 15
-     * tableC.parseMethod("sum(five,ten)", {five:5,ten:10});
+     * TableCreator.parseMethod("sum(five,ten)", {five:5,ten:10});
      *
      * @param {string} methodString - a text representation of a calculation
      * @param {object} data - a structure where some keys can be found in methodString
      * @returns {Number} The final answer to the calculation
-     * @memberOf tableC
+     * @memberOf TableCreator
      */
-    parseMethod: function(methodString, data) {
+    this.parseMethod = function(methodString, data) {
     var parts = methodString.replace(/\s+/g, "");
         parts = parts.split(/([\,\(\)])/).clean();
 
@@ -359,7 +389,7 @@ var tableC = {
         for (var x = 0; x < parts.length; ++x) {
             var token = parts[x];
             // methods
-            if (tableC.methods.hasOwnProperty(token)) {
+            if (this.methods.hasOwnProperty(token)) {
                 operatorStack.push(token);
             }
             // scope
@@ -374,7 +404,7 @@ var tableC = {
             else if (token === ')') {
                 var call = operatorStack.pop();
                 var args = argArrayStack.pop();
-                var result = tableC.calculate(call, args, data);
+                var result = this.calculate(call, args, data);
                 argArrayStack[argArrayStack.length-1].push(result);
             }
             // arguments
@@ -390,6 +420,6 @@ var tableC = {
         var value = parseFloat(argArrayStack.pop()).toFixed(precision);
         value = isNaN(value) ? "" : value;
         return value;
-    }
+    };
 
-};
+}
