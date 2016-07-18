@@ -87,6 +87,10 @@ tbody tr:nth-child(2n+1) {
 	padding-right: 1em;
 }
 
+.tc_warning {
+	border: 3px solid #FF4500;
+}
+
 @media print {
   .tc-hidden-print {
     width: 0px;
