@@ -1,5 +1,5 @@
 /**
- * @fileoverview TableCreation
+ * @fileoverview TableCreator
  * @copyright Fylkesmannen i Sogn og Fjordane 2016
  * @author Per Kristian Warvik <fmsfpkw@fylkesmannen.no>
  * @license MIT
@@ -32,6 +32,12 @@ function TableCreator(data, el) {
     }
 
     /**
+     * Store reference to this TableCreator as an internal context.
+     * (Note: In JavaScript, all objects are referenced.)
+     */
+    this.ctx = this;
+
+    /**
      * Object containing json structure defining table with content.
      * @memberOf TableCreator
      */
@@ -59,7 +65,13 @@ function TableCreator(data, el) {
      */
     this.build = function() {
         this.buildTable(this.data, this.el);
-    }
+        return this;
+    };
+
+    this.activate = function() {
+        this.addEditLinks();
+        return this;
+    };
 
     /** 
      * Building a html table from data and put it the given element.
@@ -159,16 +171,25 @@ function TableCreator(data, el) {
                             break;
                         case 'actionArray':
                             html += '<td class="tcRightAlign ' + cls + '">';
+
+                            // Add spinner if column is cached while saving to server
+                            var cache = dataLine.hasOwnProperty("cache") ? dataLine.cache : null;
+                            if(cache !== null) {
+                                html += '<i class="fa fa-refresh fa-spin"></i>';
+                            }
+
+                            // add action icons for a column
                             var actions = column[x].hasOwnProperty("actions") ? column[x].actions : null;
                             if(actions !== null && actions.constructor === Array ) {
                                 for(var a = 0; a < actions.length; ++a) {
                                     switch(actions[a]) {
                                         case 'edit':
-                                            html += '<span class="edit">rediger</span>';
+                                            html += '<span class="tcAction edit" data-tc_action="edit" data-tc_row="' + line + '">rediger</span>';
                                             break;
                                     }
                                 }
                             }
+
                             html += '</td>';
                             break;
                         default:
@@ -229,7 +250,7 @@ function TableCreator(data, el) {
      * // returns '15 000'
      * TableCreator.formatData( 15000, 'number' );
      */
-     this.formatData = function formatData(value, type) {
+    this.formatData = function formatData(value, type) {
         var val = value;
         switch(type) {
             case 'number':
@@ -243,7 +264,7 @@ function TableCreator(data, el) {
                 break;
         }
         return val;
-     };
+    };
 
     /**
      * Object containing arithmetic methods (method name as key and function([array of numbers]) as values).
@@ -380,7 +401,7 @@ function TableCreator(data, el) {
      * @memberOf TableCreator
      */
     this.parseMethod = function(methodString, data) {
-    var parts = methodString.replace(/\s+/g, "");
+        var parts = methodString.replace(/\s+/g, "");
         parts = parts.split(/([\,\(\)])/).clean();
 
         var argArrayStack = [[]];
@@ -422,4 +443,221 @@ function TableCreator(data, el) {
         return value;
     };
 
+    this.editFor = function(rowIdx) {
+        var row = this.data.tbody[rowIdx];
+        var cols = this.data.thead.cols;
+        var settings = this.data.table;
+        var html = '';
+
+        for(var i = 0; i < cols.length; ++i) {
+            var id = cols[i].id;
+            var title = cols[i].title;
+            var type = cols[i].type;
+            var pool = null;
+
+            if (cols[i].hasOwnProperty("method") || type === 'method' || type === 'actionArray') {
+                continue;
+            }
+
+            html += '<div class="form-group row">';
+            html += '<label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '</label>';
+
+            if (type === 'number') {
+                html += '<div class="col-md-push-3 col-md-5">';
+            } else {
+                html += '<div class="col-md-8">';
+            }
+
+            if(settings.pool.hasOwnProperty(id)) {
+                if (settings.pool[id].constructor === Array) {
+                    type = 'dropdown';
+                    pool = settings.pool[id];
+                }
+            }
+
+            switch (type) {
+                case 'undefined':
+                case 'default':
+                case 'string':
+                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    break;
+                case 'number':
+                    var frac = Math.pow(10,settings.settings.decimals);
+                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    break;
+                case 'dropdown':
+                    html += '<select class="form-control" name="tcEdit_' + id + '">';
+                    for (var j = 0; j < pool.length; ++j) {
+                        var selected = (row[id] === pool[j]) ? ' selected="selected"' : '';
+                        html += '<option' + selected + '>' + pool[j] + '</option>';
+                    }
+                    html += '</select>';
+                    break;
+            }
+
+            html += '</div></div>';
+        }
+
+        return html;
+    };
+
+    /**
+     * @param package {Object} jQuery DOM element object
+     * @param rowIdx {number} Position of the row in data.tbody that should be saved to.
+     */
+    this.saveEdit = function (bodyElement, rowIdx) {
+        var dictionary = [];
+
+        var validity = true;
+        var formElements = bodyElement.find("input[name^='tcEdit_']");
+        formElements.each(function() {
+            var elem = $(this);
+                console.log(this);
+            // if($(this).checkValidity() == false) {
+            if($(this).callProp('checkValidity') == false) {
+                validity = false;
+                elem.addClass("tc_warning");
+            }
+            else {
+                console.log(this);
+                elem.removeClass("tc_warning");
+            }
+        });
+        if (validity === false) {
+            return false;
+        }
+
+        var inputs = bodyElement.find("input[name^='tcEdit_']");
+
+        var element, key, value, type;
+        inputs.each(function(index, inputElement) {
+            element = $(inputElement);
+            key = element.attr('name').slice("tcEdit_".length);
+            value = element.val();
+            type = element.attr('type');
+            dictionary.push({ "key": key, "value": value, "type": type });
+            console.log({ "key": key, "value": value });
+        });
+        
+        var selects = bodyElement.find("select[name^='tcEdit_']");
+        selects.each(function(index, select) {
+            element = $(select);
+            key = element.attr('name').slice("tcEdit_".length);
+            value = element.val();
+            dictionary.push({ "key": key, "value": value });
+            console.log({ "key": key, "value": value });
+        });
+
+        var oldValues = {};
+        var row = this.data.tbody[rowIdx];
+
+        var validationFail = false;
+        for (var i = 0; i < dictionary.length; ++i) {
+            key = dictionary[i].key;
+            value = dictionary[i].value;
+            type = dictionary[i].hasOwnProperty("type") ? dictionary[i].type : null;
+            if(row.hasOwnProperty(key)) {
+                if(type == 'number' && row[key] !== parseFloat(value)) {
+                    oldValues[key] = row[key];
+                    value = parseFloat(value);
+                    if(isNaN(value)) {
+                        var elem = bodyElement.find("[name^='tcEdit_" + key + "']");
+                        elem.toggleClass("tc_warning");
+                        validationFail = true;
+                        continue;
+                    }
+                    row[key] = parseFloat(value);
+                }
+                else if (row[key] !== value ) {
+                    oldValues[key] = row[key];
+                    row[key] = value;
+                }
+            }
+            else {
+                oldValues[key] = null;
+                row[key] = value;
+            }
+            console.log(key + ' changed it\'s value from ' + oldValues[key] + ' to ' + value);
+        }
+
+        if (validationFail) {
+            return false;
+            return this.spawnEditModal(rowIdx);
+        }
+
+        if(!$.isEmptyObject(oldValues)) {
+            row["cache"] = oldValues;
+        }
+        console.log(row);
+        console.log(this.data.tbody[rowIdx]);
+        console.log("Yay! Will store in " + rowIdx);
+
+        this.build().activate();
+
+        // $.ajax()
+        // adding spinner when (row.cache != null) (done)
+        // TODO: request savechange to server
+        // TODO:  - if valid, replace spinner with fading check-sign
+        // TODO:  - if unvalid, display error and replace new values with old.
+    }
+
+    /**
+     * addEditLinks - Bind click method for edit links
+     * @return void
+     */
+    this.addEditLinks = function() {
+        // var value = this.editFor(2);
+        // var container = $("#EditModal");
+        // var body = container.find(".modal-body");
+        // body.html(value);
+        // container.modal('toggle');
+
+
+
+        var ctx = this;
+        var editActionLink = $(this.el).find(".tcAction.edit");
+        editActionLink.on("click", editAction);
+
+        function editAction(data) {
+            // var container = $("#EditModal");
+            var index = data.target.getAttribute("data-tc_row");
+            ctx.spawnEditModal(index);
+            // var body = container.find(".modal-body");
+            // body.html(ctx.editFor(index));
+
+            // var savebutton = container.find("#EditSave");
+            // savebutton.off("click").on("click", saveClickEvent);
+
+            // function saveClickEvent() {
+            //     ctx.saveEdit(body, index);
+            // }
+
+            // // var row = ctx.data.tbody[index];
+            // // console.log(row);
+            // container.modal('toggle');
+            // // var template = $("#ModalTemplate").length;
+            // // console.log(template);
+            // // console.log(ctx);
+            // // console.log(data.target.getAttribute("data-tc_row"));
+            // // console.log(data);
+        }
+    };
+
+    this.spawnEditModal = function(rowIdx) {
+        var ctx = this;
+        var container = $("#EditModal");
+        var body = container.find(".modal-body");
+        body.html(this.editFor(rowIdx));
+
+        var savebutton = container.find("#EditSave");
+        savebutton.off("click").on("click", saveClickEvent);
+
+        function saveClickEvent() {
+            return ctx.saveEdit(body, rowIdx);
+        }
+
+        container.modal('show');
+    }
+
+    return this;
 }
