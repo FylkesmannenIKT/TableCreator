@@ -1,3 +1,6 @@
+/*global $*/
+/*exported TableCreator*/
+
 /**
  * @fileoverview TableCreator
  * @copyright Fylkesmannen i Sogn og Fjordane 2016
@@ -27,6 +30,11 @@ Array.prototype.clean = function() {
  */
 function TableCreator(data, el) {
 
+    /*
+     * Always return a new instance of the TableCreator.
+     * If the new keyword has not been used, we use it so
+     * that we get an instance of TableCreator.
+     */
     if (!(this instanceof TableCreator)) {
         return new TableCreator(data, el);
     }
@@ -54,21 +62,68 @@ function TableCreator(data, el) {
      * @memberOf TableCreator
      */
     this.settings = {
-        precision: 2
+        precision: 2,
+        saveUrl: null,
+        deleteUrl: null
     };
 
     /** 
      * Building a html table from data the TableCreator has.
-     *
-     * @return void
      * @memberOf TableCreator
+     * @example
+     * var table = new TableCreator(jsonStructure, document.querySelector("#container"))
+     *     .build()
+     *     .setSaveUrl("/save")
+     *     .setDeleteUrl("/delete")
+     *     .activate();
+     *
+     * @return {object} context The current TableCreator
      */
     this.build = function() {
         this.buildTable(this.data, this.el);
         return this;
     };
 
+    /**
+     * Sets a url we can call to save edited rows
+     * @memberOf TableCreator
+     * 
+     * @param {string} saveUrl Url to call by ajax
+     * @return {object} context The current TableCreator
+     */
+    this.setSaveUrl = function(saveUrl) {
+        this.settings.saveUrl = saveUrl;
+        return this;
+    };
+
+    /**
+     * Sets a url we can call to delete rows
+     * @memberOf TableCreator
+     * 
+     * @param {string} deleteUrl Url to call by ajax
+     * @return {object} context The current TableCreator
+     */
+    this.setDeleteUrl = function(deleteUrl) {
+        this.settings.deleteUrl = deleteUrl;
+        return this;
+    };
+
+    /**
+     * Activate editing on the table.
+     * OK Edit row in table
+     * x  Delete row in table
+     * @memberOf TableCreator
+     *
+     * @return {object} context The current TableCreator
+     */
     this.activate = function() {
+        if (this.settings.saveUrl === null) {
+            console.warn("Url to save changes is not set.");
+        }
+        if (this.settings.deleteUrl === null) {
+            console.warn("Url to delete rows is not set.");
+        }
+
         this.addEditLinks();
         return this;
     };
@@ -513,8 +568,9 @@ function TableCreator(data, el) {
         formElements.each(function() {
             var elem = $(this);
                 console.log(this);
-            // if($(this).checkValidity() == false) {
-            if($(this).callProp('checkValidity') == false) {
+
+            // use checkValidity by webshim
+            if($(this).callProp('checkValidity') === false) {
                 validity = false;
                 elem.addClass("tc_warning");
             }
@@ -582,11 +638,10 @@ function TableCreator(data, el) {
 
         if (validationFail) {
             return false;
-            return this.spawnEditModal(rowIdx);
         }
 
         if(!$.isEmptyObject(oldValues)) {
-            row["cache"] = oldValues;
+            row.cache = oldValues;
         }
         console.log(row);
         console.log(this.data.tbody[rowIdx]);
@@ -599,7 +654,7 @@ function TableCreator(data, el) {
         // TODO: request savechange to server
         // TODO:  - if valid, replace spinner with fading check-sign
         // TODO:  - if unvalid, display error and replace new values with old.
-    }
+    };
 
     /**
      * addEditLinks - Bind click method for edit links
@@ -657,7 +712,7 @@ function TableCreator(data, el) {
         }
 
         container.modal('show');
-    }
+    };
 
     return this;
 }
