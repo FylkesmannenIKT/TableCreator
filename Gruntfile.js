@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'build/<%= pkg.name %>.min.css': [ 'src/<%= pkg.name %>.css' ]
+          'build/<%= pkg.name %>.min.css': [ 'src/<%= pkg.name %>.css', 'src/reset.css' ]
         }
       }
     },
@@ -55,7 +55,29 @@ module.exports = function(grunt) {
         //forms-ext feature option default: false
         replaceUI: false,
         //is swfobject not used on site default: true (used only with mediaelement)
-        includeSwfmini: true
+        includeSwfmini: false
+      }
+    },
+    copy: {
+      export: {
+        files: [
+          {
+            // expand: true, 
+            src: ['src/tablecreator.js', 'src/polyfiller-custom.js'],
+            dest: '/Project/Nokkeltall/Nokkeltall/Scripts/tablecreator/',
+          },{
+            src: ['src/tablecreator.css', 'src/reset.css'],
+            dest: '/Project/Nokkeltall/Nokkeltall/Content/tablecreator/',
+          },{
+            expand: true, 
+            src: ['build/tablecreator.min.js', 'build/polyfiller-custom.min.js'],
+            dest: '/Project/Nokkeltall/Nokkeltall/Scripts/tablecreator/',
+          },{
+            expand: true,
+            src: ['build/tablecreator.min.css'],
+            dest: '/Project/Nokkeltall/Nokkeltall/Content/tablecreator/',
+          }
+        ]
       }
     }
 
@@ -66,8 +88,12 @@ module.exports = function(grunt) {
   // Load the plugins that provides the tasks.
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-jsdoc');
 
   // Default task(s).
   grunt.registerTask('default', ['uglify','cssmin','jsdoc']);
+  grunt.registerTask('export_to_Nokkeltall', ['copy:export']);
+
+  grunt.registerTask('polyfill', ['optimizePolyfiller']);
 };
