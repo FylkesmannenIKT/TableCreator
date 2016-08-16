@@ -714,7 +714,9 @@ function TableCreator(data, el) {
     };
 
     this.spawnEditModal = function(rowIdx, errors) {
-        if (errors === undefined) errors = null;
+        errors = !errors ? null :                                    // if falsy: null
+                    errors.constructor === String ? [errors] :       // if string: array with string
+                    errors.constructor === Array ? errors : null;    // if array: itself, else: null
         
         var ctx = this;
         var container = $("#EditModal");
@@ -722,17 +724,16 @@ function TableCreator(data, el) {
         body.data("rowIdx", rowIdx);
         body.html(this.editFor(rowIdx));
 
-        if(errors !== null) {
-            var errorDiv = $('<div class="panel panel-warning">');
+        if(!!errors) {
+            var errorDiv = $('<div class="panel panel-danger">');
             errorDiv.append('<div class="panel-heading">Feil</div>');
             var errorBody = $('<div class="panel-body"></div>');
             errorDiv.append(errorBody);
             for(var i = 0; i < errors.length; ++i) {
-                var item = $('<li>');
+                var item = $('<p>');
                 item.html(errors[i]);
                 errorBody.append(item);
             }
-            // console.log(errors);
             body.prepend(errorDiv);
         }
 
