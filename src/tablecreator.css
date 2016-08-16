@@ -94,6 +94,21 @@ tbody tr:nth-child(2n+1) {
 	padding-right: 1em;
 }
 
+.add {
+	margin-top: 3px;
+	display: inline-block;
+	cursor: pointer;
+	padding: 3px;
+}
+
+.add:before {
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: 18px;
+	content: "\f067";
+	padding-right: 1em;
+	vertical-align: middle;
+}
+
 .retry:before {
 	content: "\f021";
 	padding-right: 1em;
