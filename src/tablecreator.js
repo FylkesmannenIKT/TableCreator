@@ -744,6 +744,7 @@ function TableCreator(data, el) {
         }
 
         container.modal('show');
+        body.find(".form-control").first().focus().select();
     };
 
     this.editFor = function(rowIdx) {
