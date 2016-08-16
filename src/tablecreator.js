@@ -58,6 +58,20 @@ function TableCreator(data, el) {
     this.el = el;
 
     /**
+     * Enable keyboard by making table clickable, so that we can use the "Enter" button 
+     * to activate elements we have navigated to (i.e. by tabing).
+     */
+    this.el.onkeyup = function(evt) {
+        if (evt.which == 13 || evt.keyCode == 13) {
+            evt.path[0].click();
+        }
+        console.log(evt);
+        return true; // to bubble event further
+    };
+
+
+
+    /**
      * Object containing settings.
      * @memberOf TableCreator
      */
@@ -289,16 +303,16 @@ function TableCreator(data, el) {
                                     switch(actions[a]) {
                                         case 'retry': 
                                             if(dataLine.hasOwnProperty("retry") && dataLine.retry !== null) {
-                                                html += '<span title="Prøv på nytt" class="tcAction retry" data-tc_action="retry" data-tc_row="' + line + '">Prøv på nytt</span>';
+                                                html += '<a title="Prøv på nytt" class="tcAction retry" data-tc_action="retry" data-tc_row="' + line + '" tabindex="0">Prøv på nytt</a>';
                                             }
                                             break;
                                         case 'undo':
                                             if(dataLine.hasOwnProperty("undo") && dataLine.undo !== null) {
-                                                html += '<span title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + line + '">angre</span>';
+                                                html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + line + '" tabindex="0">angre</a>';
                                             }
                                             break;
                                         case 'edit':
-                                            html += '<span title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + line + '">rediger</span>';
+                                            html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + line + '" tabindex="0">rediger</a>';
                                             break;
                                     }
                                 }
