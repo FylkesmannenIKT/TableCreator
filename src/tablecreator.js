@@ -972,15 +972,17 @@ function TableCreator(data, el) {
         // TODO:  - if unvalid, display error and replace new values with old.
     };
 
-    this.setEditModalError = function(errorMessage, errorArray) {
-        var modal = $('#EditModal');
+    this.setModalError = function(modalId, errorMessage, errorArray) {
+        var modal = $(modalId);
         var errorDiv = modal.find('.errorDiv');
         if (errorDiv.length === 0) {
             errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
             modal.find('.modal-body').prepend(errorDiv);
         }
 
-        errorDiv.html('<p>' + errorMessage + '</p>');
+        if(!!errorMessage) {
+            errorDiv.html('<p>' + errorMessage + '</p>');
+        }
 
         if(!!errorArray && errorArray.constructor === Array) {
             for(var i = 0; i < errorArray.length; ++i)
