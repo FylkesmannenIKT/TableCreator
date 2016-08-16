@@ -191,6 +191,10 @@ function TableCreator(data, el) {
         }
         this.addEditLinks();
 
+        if ($('#UndoModal').length === 0) {
+            this.createModal('Undo', 'Angre', 'Lukk', 'Utfør');
+        }
+        this.addUndoLinks();
         // Add undo modal if not created and bind click events to undo icons
         // if (this.settings.hasUndoModal === false) {
         //     var undoModal = this.createModal("tcUndoModal", "Angre");
