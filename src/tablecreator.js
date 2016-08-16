@@ -646,11 +646,13 @@ function TableCreator(data, el) {
         var header = $('<div class="modal-header">');
         var body = $('<div class="modal-body">');
         var footer = $('<div class="modal-footer">');
+        var actionButton = $('<button type="button" class="btn btn-primary" id="' + id + 'Save">' + submitLabel + '</button>');
 
         header.append($('<button type="button" class="close" data-dismiss="modal" aria-label="Lukk"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">' + headline + '</h4>'));
-        footer.append($('<button type="button" class="btn btn-default" data-dismiss="modal">' + dismissLabel + '</button><button type="button" class="btn btn-primary" id="' + id + 'Save">' + submitLabel + '</button>'));
+        footer.append($('<button type="button" class="btn btn-default" data-dismiss="modal">' + dismissLabel + '</button>'));
+        footer.append(actionButton);
 
-        var modal = $('<div id="' + id + 'Modal" class="modal face" tabindex="1" role="dialog">')
+        var modal = $('<div id="' + id + 'Modal" class="modal face" role="dialog">')
             .append($('<div class="modal-dialog">')
                 .append($('<div class="modal-content">')
                     .append(header)
@@ -660,31 +662,20 @@ function TableCreator(data, el) {
             );
 
         $(this.el).after(modal);
+
+        modal.on("keyup", function(evt) {
+            if(evt.which == 13 || evt.keyCode == 13) { // if Enter is released
+                actionButton.click();
+            }
+            return true;
+        });
         // $('body').append(modal);
     };
 
-    // this.createModal = function(modalId, title) {
-    //     var modal = $('<div id="' + modalId + '" class="modal face" tabindex="1" role="dialog"></div>');
-    //     var dialog = $('<div class="modal-dialog"></div>');
-    //     var content = $('<div class="modal-content"></div>');
-    //     var header = $('<div class="modal-header"></div>');
-    //     var body = $('<div class="modal-body"></div>');
-    //     var footer = $('<div class="modal-footer"></div>');
 
-    //     modal.append(dialog);
-    //     dialog.append(content);
-    //     content.append(header);
-    //     content.append(body);
-    //     content.append(footer);
 
-    //     header.append('<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>');
-    //     header.append('<h4 class="modal-title">' + title + '</h4>');
 
-    //     footer.append('<button type="button" class="btn btn-default" data-dismiss="modal">Lukk</button>');
-    //     footer.append('<button type="submit" class="btn btn-primary" id="' + modalId + '_Save">Utfør</button>');
 
-    //     return modal;
-    // };
 
     /**
      * addEditLinks - Bind click method for edit links
