@@ -719,7 +719,7 @@ function TableCreator(data, el) {
         savebutton.off("click").on("click", saveClickEvent);
 
         function saveClickEvent() {
-            return ctx.saveEdit(body, rowIdx);
+            return ctx.saveEditAction(body, rowIdx);
         }
 
         container.modal('show');
@@ -787,7 +787,7 @@ function TableCreator(data, el) {
      * @param package {Object} jQuery DOM element object
      * @param rowIdx {number} Position of the row in data.tbody that should be saved to.
      */
-    this.saveEdit = function (bodyElement, rowIdx) {
+    this.saveEditAction = function (bodyElement, rowIdx) {
         var ctx = this;
         var dictionary = [];
 
