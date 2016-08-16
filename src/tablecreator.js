@@ -82,6 +82,7 @@ function TableCreator(data, el) {
         precision: 2,
         isGrowable: true,
         
+        createUrl: null,
         saveUrl: null,
         deleteUrl: null
     };
@@ -100,6 +101,18 @@ function TableCreator(data, el) {
      */
     this.build = function() {
         this.buildTable(this.data, this.el);
+        return this;
+    };
+
+    /**
+     * Sets an url we can call to create a new row
+     * @memberOf TableCreator
+     *
+     * @param {string} createUrl Url to call by ajax
+     * @return {object} context The current TableCreator
+     */
+    this.setCreateUrl = function(createUrl) {
+        this.settings.createUrl = createUrl;
         return this;
     };
 
@@ -150,6 +163,10 @@ function TableCreator(data, el) {
      * @return {object} context The current TableCreator
      */
     this.activate = function() {
+        if (this.settings.createUrl === null) {
+            console.warn("Url to create row is not set.");
+        }
+
         if (this.settings.saveUrl === null) {
             console.warn("Url to save changes is not set.");
         }
