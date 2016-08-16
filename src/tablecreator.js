@@ -80,6 +80,7 @@ function TableCreator(data, el) {
         instanceId: null,
 
         precision: 2,
+        isGrowable: true,
         
         saveUrl: null,
         deleteUrl: null
@@ -180,6 +181,16 @@ function TableCreator(data, el) {
         //     this.settings.hasUndoModal = true;
         // }
         // this.addUndoLinks();
+
+        if(this.settings.isGrowable) {
+            var ctx = this;
+            var addRowLink = $('<a class="tcAction add" tabindex="0">Legg til ny rad</a>');
+            $(this.el).append(addRowLink);
+
+            addRowLink.on("click", function() {
+                ctx.newAction();
+            });
+        }
 
         return this;
     };
