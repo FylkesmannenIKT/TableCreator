@@ -977,5 +977,358 @@ function TableCreator(data, el) {
         }
     };
 
+
+
+    /*********************************************************************************
+     *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO 
+     ********************************************************************************/
+
+    /*********************************************************************************
+     *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO 
+     ********************************************************************************/
+
+    /*********************************************************************************
+     *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO 
+     ********************************************************************************/
+
+    /*********************************************************************************
+     *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO 
+     ********************************************************************************/
+
+    /*********************************************************************************
+     *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO *** UNDO 
+     ********************************************************************************/
+
+    /**
+     * addUndoLinks - Bind click method for edit links
+     * @return void
+     */
+    this.addUndoLinks = function() {
+        var ctx = this;
+        var undoActionLink = $(this.el).find(".tcAction.undo");
+        undoActionLink.on("click", undoAction);
+
+        function undoAction(data) {
+            var index = data.target.getAttribute("data-tc_row");
+            ctx.spawnUndoModal(index);
+        }
+    };
+
+    this.spawnUndoModal = function(rowIdx, errors) {
+        if(errors === undefined) errors = null;
+        var ctx = this;
+        var container = $("#UndoModal");
+        var body = container.find('.modal-body');
+        body.html('<p>Angre og gå eit steg tilbake?</p>');
+
+        var button = container.find("#UndoSave");
+        button.off("click").on("click", clickEvent);
+
+        function clickEvent() {
+            ctx.undoEditAction(rowIdx);
+        }
+
+        container.modal('show');
+        button.focus().select();
+    };
+
+    this.undoEditAction = function(rowIdx) {
+        var row = this.data.tbody[rowIdx];
+        if (!row.undo) return;
+        row.isSaving = true;
+        this.build().activate();
+        var ctx = this;
+
+        var requestObj = {};
+        for (var prop in row) {
+            if(row.hasOwnProperty(prop) && prop !== "undo") {
+                requestObj[prop] = row[prop];
+            }
+        }
+
+        for (var change in row.undo) {
+            if (row.undo.hasOwnProperty(change) && change !== "undo") {
+                requestObj[change] = row.undo[change];
+            }
+        }
+
+        var ajaxData = {
+            SchemaId: this.settings.schemaId,
+            InstanceId: this.settings.instanceId,
+            RowId: rowIdx,
+            Data: JSON.stringify(requestObj)
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: this.settings.saveUrl,
+            dataType: 'json',
+            data: ajaxData,
+            success: successOnUndo,
+            // error: successOnUndo
+            error: errorOnUndo
+        });
+
+        function errorOnUndo(response) {
+            row.isSaving = false;
+            ctx.build().activate();
+            var modal = $('#UndoModal');
+            var errorDiv = $('#UndoModal .errorDiv');
+            if (errorDiv.length === 0) {
+                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                modal.find('.modal-body').prepend(errorDiv);
+            }
+
+            switch(response.status) {
+                case 404:
+                    errorDiv.html('<p>Fikk ikke angret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
+                    break;
+                default:
+                    errorDiv.html('<p>Angring ikke mulig (feil ' + response.status + ').</p>');
+                    break;
+            }
+        }
+
+        function successOnUndo(data) {
+            // TESTDATA {
+            // data.Success = true;
+            // data.Message = "data.Message";
+            // data.Errors = ["Error 0", "Error 1", "Error 2"];
+            // } TESTDATA
+
+            // We got an answer from the server, but it did not approve input
+            if(data.Success === false) {
+                ctx.setModalError("#UndoModal", data.Message, data.Errors);
+
+                ctx.removeLastUndo(rowIdx);
+                row.isSaving = false;
+                ctx.build().activate();
+                return;
+            }
+
+            // Server answered Success === true, so set undo values as current values
+            for (var attr in requestObj) {
+                if(requestObj.hasOwnProperty(attr)) {
+                    row[attr] = requestObj[attr];
+                }
+            }
+
+            ctx.removeLastUndo(rowIdx);            
+
+            // rebuild with new state
+            row.isSaving = false;
+            ctx.build().activate();
+
+            $("#UndoModal").modal('hide');
+        }
+    };
+
+    /********************************************************************************
+     *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE *** CREATE ***
+     *******************************************************************************/
+
+    this.newAction = function() {
+        var ctx = this;
+        var container = $('#EditModal');
+        var body = container.find('.modal-body');
+        body.html(this.blankRowEditor());
+
+        var savebutton = container.find('#EditSave');
+        savebutton.off("click").on("click", createClickEvent);
+
+        function createClickEvent() {
+            ctx.constructRow(container);
+        }
+
+        container.modal('show');
+    };
+
+    this.constructRow = function (container) {
+        console.log(container);
+        var ctx = this;
+
+        var validity = true;
+        var newRow = {};
+        var element, key, value;
+        var formElements = container.find("[name^='tcEdit_']");
+        formElements.each(function() {
+            element = $(this);
+            console.log("elem:");
+            console.log(element);
+
+            // use checkValidity by webshim
+            if(element.callProp('checkValidity') === false) {
+                validity = false;
+                element.addClass("tc_warning");
+            } else {
+                element.removeClass("tc_warning");
+                key = element.attr('name').slice("tcEdit_".length);
+                value = element.val();
+                newRow[key] = value;
+            }
+
+            // check validity on select elements
+            if(element.is("select")) {
+                var notAvailible = !ctx.data.table.pool.hasOwnProperty(key);
+                var notInArray = (!notAvailible) ? (-1 === $.inArray(value, ctx.data.table.pool[key])) : false;
+                if(notAvailible || notInArray) {
+                    validity = false;
+                    element.addClass("tc_warning");
+                }
+            }
+        });
+
+        if (validity === false) {
+            console.log("validity failed");
+            return;
+        }
+
+        if (this.settings.createurl === null) {
+            return;
+        }
+
+        var ajaxData = {
+            SchemaId: this.settings.schemaId,
+            InstanceId: this.settings.instanceId,
+            Data: JSON.stringify(newRow)
+        };
+
+        var footer = container.find('.modal-footer');
+        footer.prepend($('<i class="fa fa-save fa-lg" style="margin-right: 1em;"></i>'));
+        footer.prepend($('<i class="fa fa-refresh fa-spin" style="margin-right: 1em;"></i>'));
+
+        $.ajax({
+            type: 'POST',
+            url: this.settings.createUrl,
+            dataType: 'json',
+            data: ajaxData,
+            success: successOnCreate,
+            error: errorOnCreate,
+            // success: errorOnCreate,
+            // error: errorOnCreate
+        });
+        // TODO: SERVER-SIDE ajax!!!
+
+        function errorOnCreate(jqXHR) {
+            var modal = $('#EditModal');
+            var errorDiv = modal.find('.errorDiv');
+            if(errorDiv.length === 0) {
+                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                modal.find('.modal-body').prepend(errorDiv);
+            }
+
+            switch (jqXHR.status) {
+                case 404:
+                    errorDiv.html('<p><b>Ikke lagret:</b> Finner ikke lagringsplass (feil 404).</p>');
+                    break;
+                default:
+                    errorDiv.html('<p><b>Ikke lagret:</b> Lagring ikke mulig (feil ' + jqXHR.status + ').</p>');
+                    break;
+            }
+
+            footer.find("i.fa-spin").fadeOut(1000, function() { $(this).remove(); });
+            footer.find("i.fa-save").fadeOut(1000, function() { $(this).remove(); });
+        }
+
+        function successOnCreate(data) {
+            // data.Success = true;
+            // data.Message = "Message";
+            // data.Errors = ["Message1", "Message2", "Message3"];
+
+
+            if (data.Success !== true) {
+                var errors = (!!data.Errors && data.Errors.constructor === Array) ? data.Errors : null;
+                ctx.setModalError('#EditModal', data.Message, errors);
+
+                footer.find("i.fa-spin").fadeOut(500, function() { $(this).remove(); });
+                footer.find("i.fa-save").fadeOut(1000, function() { $(this).remove(); });
+                return;
+            }
+
+            ctx.data.tbody.push(newRow);
+            ctx.build().activate();
+            container.modal('hide');
+            footer.find("i.fa").remove();
+        }
+
+        // this.data.tbody.push(newRow);
+        // this.build().activate();
+        // container.modal('hide');
+
+    };
+
+    this.blankRowEditor = function() {
+        var cols = this.data.thead.cols;
+        var settings = this.data.table;
+        var html = '';
+
+        for (var i = 0; i < cols.length; ++i) {
+            var id = cols[i].id;
+            var title = cols[i].title;
+            var type = cols[i].type;
+            var pool = null;
+
+            if (cols[i].hasOwnProperty("method") || type === 'method' || type === 'actionArray') {
+                continue;
+            }
+
+            html += '<div class="form-group row">';
+            html += '<label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '</label>';
+
+            if (type === 'number') {
+                html += '<div class="col-md-push-3 col-md-5">';
+            } else {
+                html += '<div class="col-md-8">';
+            }
+
+            if (settings.pool.hasOwnProperty(id)) {
+                if (settings.pool[id].constructor === Array) {
+                    type = 'dropdown';
+                    pool = settings.pool[id];
+                }
+            }
+
+            switch (type) {
+                case 'undefined':
+                case 'default':
+                case 'string':
+                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '"/>';
+                    break;
+                case 'number':
+                    var frac = Math.pow(10, settings.settings.decimals);
+                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="0"/>';
+                    break;
+                case 'dropdown':
+                    html += '<select class="form-control" name="tcEdit_' + id + '">';
+                    html += '<option selected disabled>Velg en...</option>';
+                    for (var j = 0; j < pool.length; ++j) {
+                        html += '<option>' + pool[j] + '</option>';
+                    }
+                    html += '</select>';
+                    break;
+            }
+
+            html += '</div></div>';
+        }
+
+        return html;
+    };
+
     return this;
 }
