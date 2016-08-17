@@ -608,42 +608,6 @@ function TableCreator(data, el) {
     };
 
     /**
-     * addUndoLinks - Bind click method for edit links
-     * @return void
-     */
-    this.addUndoLinks = function() {
-        var ctx = this;
-        var undoActionLink = $(this.el).find(".tcAction.undo");
-        undoActionLink.on("click", undoAction);
-
-        function undoAction(data) {
-            var index = data.target.getAttribute("data-tc_row");
-            ctx.spawnUndoModal(index);
-        }
-    };
-
-    this.spawnUndoModal = function(rowIdx, errors) {
-        if(errors === undefined) errors = null;
-        var ctx = this;
-        var container = $("#tcUndoModal"); /* TODO: Create!!! */
-        var body = container.find('.modal-body');
-        body.html('<p>Angre og gå eit steg tilbake?</p>');
-
-        var button = container.find("#tcUndoModal_Save");
-        button.off("click").on("click", clickEvent);
-
-        function clickEvent() {
-            ctx.undoAction(rowIdx);
-        }
-
-        container.modal('show');
-    };
-
-    this.undoAction = function() {
-        alert("Angre!");
-    };
-
-    /**
      * Create a modal
      * The ID of the submit button will be the modalId postfixed with _Save
      * @param {string} modalId The DOM ID to reference the returned modal
