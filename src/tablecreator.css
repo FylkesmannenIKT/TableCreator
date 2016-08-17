@@ -130,14 +130,6 @@ a.tcAction:focus {
 
 @media print {
   .tc-hidden-print {
-    width: 0px;
-    overflow: hidden;
-    font-size: 0;
-    /*padding: 0;*/
-    margin: 0;
-  }
-
-  .tc-hidden-print * {
     display: none;
   }
 
