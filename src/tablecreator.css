@@ -15,6 +15,19 @@ th {
 th.tcTableHeaders {
 	text-align: left;
 	padding: 5px;
+	border-bottom: 1px solid;
+	border-right: 0;
+}
+
+th.tcTableHeaders.tc-hidden-print {
+	border-bottom: 0;
+}
+
+th {
+	border-right: 1px solid;
+}
+td {
+	border-right: 1px dashed;
 }
 
 td.tcRightAlign {
@@ -27,6 +40,11 @@ td.tcBold {
 
 td.tcCenterAlign {
 	text-align: center;
+}
+
+th.tcLeftAlign,
+td.tcLeftAlign {
+	text-align: left;
 }
 
 th,
@@ -133,7 +151,14 @@ a.tcAction:focus {
     display: none;
   }
 
+  td,
+  th {
+  	border-right: 1px solid;
+  }
 
+  thead {
+  	border-bottom: 1px solid;
+  }
 
   .container {
     width: 100%;
