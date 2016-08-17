@@ -252,7 +252,8 @@ function TableCreator(data, el) {
                 var hrColumn = rowList[hrCol];
                 var colspan = hrColumn.hasOwnProperty("colspan") ? ' colspan="' + hrColumn.colspan + '"' : '';
                 var title = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
-                html += '<th class="tcTableHeaders" ' + colspan + '>' + title + '</th>';
+                var hClass = hrColumn.hasOwnProperty("class") ? ' '+hrColumn.class : '';
+                html += '<th class="tcTableHeaders' + hClass + '"' + colspan + '>' + title + '</th>';
             }
             html += '</tr>';
         }
@@ -265,6 +266,9 @@ function TableCreator(data, el) {
             var headerRow = data.thead.cols[col];
             var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : null;
             var hClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
+            hClass += headerRow.type === "number" ? ' number' : '';
+            hClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
+            hClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
             html += '<th class="' + hClass + '">' + headerTitle + '</th>';
         }
         html += '</tr>';
