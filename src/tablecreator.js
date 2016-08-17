@@ -819,81 +819,81 @@ function TableCreator(data, el) {
             dictionary.push({ "key": key, "value": value });
         });
 
-        var oldValues = {};
         var row = this.data.tbody[rowIdx];
+        var oldValues = {};
+        var newValues = {};
+        var valid = true;
+        for (var x = 0; x < dictionary.length; ++x) {
+            key = dictionary[x].key;
+            value = dictionary[x].value;
+            type = dictionary[x].hasOwnProperty("type") ? dictionary[x].type : null;
 
-        var validationFail = false;
-        for (var i = 0; i < dictionary.length; ++i) {
-            key = dictionary[i].key;
-            value = dictionary[i].value;
-            type = dictionary[i].hasOwnProperty("type") ? dictionary[i].type : null;
-            if(row.hasOwnProperty(key)) {
-                if(type == 'number' && parseFloat(row[key]) !== parseFloat(value)) {
-                    oldValues[key] = row[key];
-                    value = parseFloat(value);
-                    if(isNaN(value)) {
-                        var elem = bodyElement.find("[name^='tcEdit_" + key + "']");
-                        elem.toggleClass("tc_warning");
-                        validationFail = true;
-                        continue;
-                    }
-                    row[key] = parseFloat(value);
-                }
-                else if (type != 'number' && row[key] !== value ) {
-                    oldValues[key] = row[key];
-                    row[key] = value;
+            // Test for NaN values
+            if (type == 'number') {
+                value = parseFloat(value);
+                if (row.hasOwnProperty(key)) row[key] = parseFloat(row[key]);
+
+                if (isNaN(value)) {
+                    var keyElem = bodyElement.find("[name^='tcEdit_" + key + "']");
+                    keyElem.addClass("tc_warning");
+                    valid = false;
+                    continue;
                 }
             }
-            else {
+
+            // Create objects with new and old values (do not track equal values)
+            if (!row.hasOwnProperty(key)) {
                 oldValues[key] = null;
-                row[key] = value;
+                newValues[key] = value;
             }
-            console.log(key + ' changed it\'s value from ' + oldValues[key] + ' to ' + value);
+            else if (row[key] !== value) {
+                oldValues[key] = row[key];
+                newValues[key] = value;
+            }
         }
 
-        if (validationFail) {
-            return false;
+        // A number is NaN: respawn edit modal
+        if(!valid) {
+            this.spawnEditModal(rowIdx, ["Et innskrevet tall ble ikke godkjent. Prøv igjen."]);
+            return;
         }
 
-        // add cache element
-        if(!$.isEmptyObject(oldValues)) {
-            // row.cache = oldValues;
-            row.isSaving = true;
+        // close silently if no changes is registered
+        if($.isEmptyObject(oldValues)) {
+            console.log("Ingen endringer");
+            $('#EditModal').modal('hide');
+            return;
         }
+
+        // Display load symbol
+        row.isSaving = true;
+        this.build().activate();
 
         if(!row.hasOwnProperty("undo")) {
             row.undo = null;
         }
 
-        // add undo element
-        var oldUndo = row.undo;
-        var newUndo = {};
-        for (var prop in oldValues) {
-            if(oldValues.hasOwnProperty(prop)) {
-                newUndo[prop] = oldValues[prop];
+        // create undo element and newRow element
+        var newUndo = { undo: row.undo };
+        for (var y in oldValues) {
+            if(oldValues.hasOwnProperty(y)) {
+                newUndo[y] = oldValues[y];
             }
         }
-        newUndo.undo = oldUndo;
-        row.undo = newUndo;
 
+        var newRow = {};
+        for (var z in newValues) {
+            if (newValues.hasOwnProperty(z)) {
+                newRow[z] = newValues[z];
+            }
+        }
 
-        console.log(row);
-        console.log(this.data.tbody[rowIdx]);
-        console.log("Yay! Will store in " + rowIdx);
-
-        // Activate again to add callbacks to any new undo buttons
-        this.build().activate();
-
-        // // close dialog if we have no saveUrl. Browser editing still works.
-        // if(this.settings.saveUrl === null) {
-        //     return;
-        // }
-
+        // Construct data object and start AJAX call
         var ajaxData = {
             SchemaId: this.settings.schemaId,
             InstanceId: this.settings.instanceId,
             RowId: rowIdx,
-            Data: JSON.stringify(row)
+            Data: JSON.stringify(newRow)
         };
 
         $.ajax({
@@ -905,8 +905,9 @@ function TableCreator(data, el) {
             error: errorOnSave
         });
 
-        function errorOnSave(jqXHR, textStatus, errorThrown) {
-            ctx.rowUndo(rowIdx);
+        function errorOnSave(jqXHR) {
+            row.isSaving = false;
+            ctx.build().activate();
 
             var modal = $('#EditModal');
             var errorDiv = $('#EditModal .errorDiv');
@@ -924,38 +925,24 @@ function TableCreator(data, el) {
                     break;
             }
 
-            console.log(row.undo);
             modal.modal('show');
         }
 
-        function successOnSave(data, textStatus, jqXHR) {
-            data.Success = true;
-            data.Message = "Message";
-            data.Errors = ["Message1", "Message2", "Message3"];
-
-            row.isSaving = false;
+        function successOnSave(data) {
+            row.isSaving = false;       // to remove loading symbol
 
             if(data.Success === false) {
-                // ctx.removeCache(rowIdx);
-                ctx.removeLastUndo(rowIdx);
-                var errors = (!!data.Errors && data.Errors.constructor === Array) ? data.Errors : null;
-                ctx.setEditModalError(data.Message, errors);
-
+                ctx.setModalError("#EditModal", data.Message, data.Errors);
                 ctx.build().activate();
-                console.log(row.undo);
                 return;
             }
 
-            // else: successful: saving is done, there is an undo availible, no errors displayed, modal closed.
-            ctx.build().activate();
-            // close modal
-            console.log(row.undo);
-            $('#EditModal').modal('hide');
+            ///////////////////// SUCCESSFUL SAVE! /////////////////////
+            row = newRow;
+            row.undo = newUndo;            // apply new undo
+            ctx.build().activate();        // Rebuild table
+            $('#EditModal').modal('hide'); // close modal
         }
-        // adding spinner when (row.cache != null) (done)
-        // TODO: request savechange to server
-        // TODO:  - if valid, replace spinner with fading check-sign
-        // TODO:  - if unvalid, display error and replace new values with old.
     };
 
     this.setModalError = function(modalId, errorMessage, errorArray) {
