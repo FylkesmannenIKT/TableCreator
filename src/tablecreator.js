@@ -787,7 +787,6 @@ function TableCreator(data, el) {
         var formElements = bodyElement.find("input[name^='tcEdit_']");
         formElements.each(function() {
             var elem = $(this);
-                console.log(this);
 
             // use checkValidity by webshim
             if($(this).callProp('checkValidity') === false) {
@@ -795,24 +794,21 @@ function TableCreator(data, el) {
                 elem.addClass("tc_warning");
             }
             else {
-                console.log(this);
                 elem.removeClass("tc_warning");
             }
         });
         if (validity === false) {
-            return false; /* modal will not close, thus showing tc_warning errors */
+            return; // errors will be displayed in open modal
         }
 
-        var inputs = bodyElement.find("input[name^='tcEdit_']");
-
         var element, key, value, type;
+        var inputs = bodyElement.find("input[name^='tcEdit_']");
         inputs.each(function(index, inputElement) {
             element = $(inputElement);
             key = element.attr('name').slice("tcEdit_".length);
             value = element.val();
             type = element.attr('type');
             dictionary.push({ "key": key, "value": value, "type": type });
-            console.log({ "key": key, "value": value });
         });
         
         var selects = bodyElement.find("select[name^='tcEdit_']");
@@ -821,7 +817,6 @@ function TableCreator(data, el) {
             key = element.attr('name').slice("tcEdit_".length);
             value = element.val();
             dictionary.push({ "key": key, "value": value });
-            console.log({ "key": key, "value": value });
         });
 
         var oldValues = {};
@@ -980,19 +975,6 @@ function TableCreator(data, el) {
                 errorDiv.append($('<li>' + errorArray[i] + '</li>'));
         }
     };
-
-    // this.removeCache = function(rowIdx) {
-    //     var row = this.data.tbody[rowIdx];
-    //     if(row.hasOwnProperty('cache')) {
-    //         var oldValues = row.cache;
-    //         for(var prop in oldValues) {
-    //             if (!oldValues.hasOwnProperty(prop)) continue;
-
-    //             row.prop = oldValues.prop;
-    //         }
-    //         row.cache = null;
-    //     }
-    // };
 
     this.removeLastUndo = function(rowIdx) {
         var row = this.data.tbody[rowIdx];
