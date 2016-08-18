@@ -1024,11 +1024,14 @@ function TableCreator(data, el) {
     };
 
     this.spawnUndoModal = function(rowIdx, errors) {
-        if(errors === undefined) errors = null;
         var ctx = this;
         var container = $("#UndoModal");
         var body = container.find('.modal-body');
         body.html('<p>Angre og gå eit steg tilbake?</p>');
+
+        if(!!errors) {
+            body.prepend(this.displayErrorHelper(errors));
+        }
 
         var button = container.find("#UndoSave");
         button.off("click").on("click", clickEvent);
