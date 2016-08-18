@@ -183,6 +183,7 @@ function TableCreator(data, el) {
             console.warn("Url to delete rows is not set.");
         }
 
+        $(".tcActionRow").removeClass("hide");
 
         // bind click events to undo icons
         if ($('#EditModal').length === 0) {
@@ -321,7 +322,7 @@ function TableCreator(data, el) {
                             html += '<td>' + (line+1) + '</td>';
                             break;
                         case 'actionArray':
-                            html += '<td class="tcRightAlign ' + cls + '">';
+                            html += '<td class="tcActionRow hide ' + cls + '">';
 
                             // Add spinner if column is cached while saving to server
                             var isSaving = dataLine.hasOwnProperty("isSaving") ? dataLine.isSaving : false;

@@ -7,6 +7,10 @@ table {
 	border: 1px solid black;
 }
 
+.tc_table * {
+	border-color: #ccc;
+}
+
 th {
 	text-align: center;
     font-weight: bold;
@@ -16,7 +20,7 @@ th.tcTableHeaders {
 	text-align: left;
 	padding: 5px;
 	border-bottom: 1px solid;
-	border-right: 0;
+	border-right: 0 !important;
 }
 
 th.tcTableHeaders.tc-hidden-print {
@@ -27,7 +31,18 @@ th {
 	border-right: 1px solid;
 }
 td {
-	border-right: 1px dashed;
+	border-right: 1px solid;
+}
+
+th.tcActionRow,
+td.tcActionRow {
+	border-right: 1px solid;
+	text-align: right;
+}
+
+th:nth-last-child(2),
+td:nth-last-child(2) {
+	border-right: 1px solid black;
 }
 
 td.tcRightAlign {
@@ -53,8 +68,12 @@ td {
 }
 
 tfoot td {
-	border-top: 2px solid black;
+	border-top: 2px solid;
 	margin-top: 3px;
+}
+
+tfoot td.tcActionRow {
+	border-top: 0;
 }
 
 tbody tr:nth-child(2n+1) {
@@ -78,6 +97,8 @@ tbody tr:nth-child(2n+1) {
 .minus {
 	color: red;
 }
+
+.tcActionRow {}
 
 a.tcAction:hover,
 a.tcAction:focus {
