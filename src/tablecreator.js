@@ -135,10 +135,10 @@ function TableCreator(data, el) {
      * @param {string} deleteUrl Url to call by ajax
      * @return {object} context The current TableCreator
      */
-    // this.setDeleteUrl = function(deleteUrl) {
-    //     this.settings.deleteUrl = deleteUrl;
-    //     return this;
-    // };
+    this.setDeleteUrl = function(deleteUrl) {
+        this.settings.deleteUrl = deleteUrl;
+        return this;
+    };
 
 
     /**
@@ -206,6 +206,11 @@ function TableCreator(data, el) {
         //     this.settings.hasUndoModal = true;
         // }
         // this.addUndoLinks();
+
+        if ($('#DeleteModal').length === 0) {
+            this.createModal('Delete', 'Sletting', 'Avbryt', 'Slett');
+        }
+        this.addDeleteLinks();
 
         if(this.settings.isResizable) {
             var ctx = this;
@@ -344,6 +349,10 @@ function TableCreator(data, el) {
                                             break;
                                         case 'edit':
                                             html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + line + '" tabindex="0">rediger</a>';
+                                            break;
+                                        case 'delete':
+                                            if (this.settings.isResizable)
+                                                html += '<a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + line + '" tabindex="0">slett</a>';
                                             break;
                                     }
                                 }
@@ -1329,6 +1338,106 @@ function TableCreator(data, el) {
 
         return html;
     };
+
+    /********************************************************************************
+     *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE *** DELETE ***
+     *******************************************************************************/
+
+     this.addDeleteLinks = function() {
+        var ctx = this;
+        var deleteActionLink = $(this.el).find(".tcAction.delete");
+        deleteActionLink.on("click", deleteAction);
+
+        function deleteAction(data) {
+            var index = data.target.getAttribute("data-tc_row");
+            ctx.spawnDeleteModal(index);
+        }
+     };
+
+     this.spawnDeleteModal = function(rowIdx, errors) {
+        var ctx = this;
+        var container = $('#DeleteModal');
+        var body = container.find(".modal-body");
+        // body.data("rowIdx", rowIdx);
+        body.html("Slette denne raden?");
+        if (!!errors) {
+            body.prepend(this.displayErrorHelpers(errors));
+        }
+
+        var deletebutton = container.find("#DeleteSave");
+        deletebutton.off("click").on("click", deleteClickEvent);
+
+        function deleteClickEvent() {
+            return ctx.saveDeleteAction(container, rowIdx);
+        }
+     };
+
+     this.saveDeleteAction = function (bodyElement, rowIdx) {
+        var ctx = this;
+        var row = this.data.tbody[rowIdx];
+        var deleteObj = {};
+        for (var x in row) {
+            if (row.hasOwnProperty(x)) {
+                if (x === 'undo') continue;
+                if (x === 'isSaving') continue;
+                deleteObj[x] = row[x];
+            }
+        }
+
+        var ajaxData = {
+            SchemaId: this.settings.schemaId,
+            InstanceId: this.settings.instanceId,
+            RowId: rowIdx,
+            Data: JSON.stringify(deleteObj)
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: this.settings.deleteUrl,
+            dataType: 'json',
+            data: ajaxData,
+            success: successOnDelete,
+            error: errorOnDelete
+        });
+
+        function successOnDelete(data) {
+            row.isSaving = false;
+            if(data.Success === false) {
+                ctx.setModalError("#DeleteModal", data.Message, data.Errors);
+                ctx.build().activate();
+                return;
+            }
+
+            ///////////////////// SUCCESSFUL DELETE! /////////////////////
+            ctx.data.tbody.splice(rowIdx, 1);
+            ctx.build().activate();
+            bodyElement.modal('hide');
+        }
+
+        function errorOnDelete(jqXHR) {
+            row.isSaving = false;
+            ctx.build().activate();
+
+            var errorMessage = "<p>Sletting ikke mulig (feil " + jqXHR.status + ").</p>";
+            ctx.setModalError("#DeleteModal", errorMessage);
+        }
+     }
 
     return this;
 }

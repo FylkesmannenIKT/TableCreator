@@ -106,7 +106,8 @@ a.tcAction:focus {
 }
 
 .edit,
-.undo {
+.undo,
+.delete {
 	cursor: pointer;
 	vertical-align: middle;
 	opacity: 1;
@@ -134,6 +135,11 @@ a.tcAction:focus {
 
 .undo:before {
 	content: "\f0e2";
+	padding-right: 1em;
+}
+
+.delete:before {
+	content: "\f00d";
 	padding-right: 1em;
 }
 
