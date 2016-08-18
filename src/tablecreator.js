@@ -639,6 +639,25 @@ function TableCreator(data, el) {
         // $('body').append(modal);
     };
 
+    this.displayErrorHelper = function(errors) {
+        errors = !errors ? null :                            // if falsy: null
+            errors.constructor === String ? [errors] :       // if string: array with string
+            errors.constructor === Array ? errors : null;    // if array: itself, else: null
+
+        if(!!errors) {
+            var errorDiv = $('<div class="panel panel-danger">');
+            errorDiv.append('<div class="panel-heading">Feil</div>');
+            var errorBody = $('<div class="panel-body"></div>');
+            errorDiv.append(errorBody);
+            for(var i = 0; i < errors.length; ++i) {
+                var item = $('<p>');
+                item.html(errors[i]);
+                errorBody.append(item);
+            }
+            return errorDiv;
+        }
+        return "";
+    };
 
 
     /*********************************************************************************
@@ -677,27 +696,13 @@ function TableCreator(data, el) {
     };
 
     this.spawnEditModal = function(rowIdx, errors) {
-        errors = !errors ? null :                                    // if falsy: null
-                    errors.constructor === String ? [errors] :       // if string: array with string
-                    errors.constructor === Array ? errors : null;    // if array: itself, else: null
-        
         var ctx = this;
         var container = $("#EditModal");
         var body = container.find(".modal-body");
         body.data("rowIdx", rowIdx);
         body.html(this.editFor(rowIdx));
-
-        if(!!errors) {
-            var errorDiv = $('<div class="panel panel-danger">');
-            errorDiv.append('<div class="panel-heading">Feil</div>');
-            var errorBody = $('<div class="panel-body"></div>');
-            errorDiv.append(errorBody);
-            for(var i = 0; i < errors.length; ++i) {
-                var item = $('<p>');
-                item.html(errors[i]);
-                errorBody.append(item);
-            }
-            body.prepend(errorDiv);
+        if (!!errors) {
+            body.prepend(this.displayErrorHelper(errors));
         }
 
         var savebutton = container.find("#EditSave");
