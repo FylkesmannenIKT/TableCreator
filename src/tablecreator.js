@@ -1190,7 +1190,7 @@ function TableCreator(data, el) {
             return;
         }
 
-        if (this.settings.createurl === null) {
+        if (this.settings.createUrl === null) {
             return;
         }
 
