@@ -281,11 +281,7 @@ function TableCreator(data, el) {
         {
             var dataLine = data.tbody[line];
 
-            if(dataLine.hasOwnProperty("retry")) {
-                html += '<tr class="tcNotSaved">';
-            } else {
-                html += '<tr>';
-            }
+            html += '<tr>';
 
             var column = data.thead.cols;
 
@@ -337,11 +333,6 @@ function TableCreator(data, el) {
                             if(actions !== null && actions.constructor === Array ) {
                                 for(var a = 0; a < actions.length; ++a) {
                                     switch(actions[a]) {
-                                        case 'retry': 
-                                            if(dataLine.hasOwnProperty("retry") && dataLine.retry !== null) {
-                                                html += '<a title="Prøv på nytt" class="tcAction retry" data-tc_action="retry" data-tc_row="' + line + '" tabindex="0">Prøv på nytt</a>';
-                                            }
-                                            break;
                                         case 'undo':
                                             if(dataLine.hasOwnProperty("undo") && dataLine.undo !== null) {
                                                 html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + line + '" tabindex="0">angre</a>';
