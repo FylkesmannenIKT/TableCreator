@@ -80,7 +80,7 @@ function TableCreator(data, el) {
         instanceId: null,
 
         precision: 2,
-        isGrowable: true,
+        isResizable: false,
         
         createUrl: null,
         saveUrl: null,
@@ -142,17 +142,26 @@ function TableCreator(data, el) {
 
 
     /**
-     * Creates modal if it does not exist.
+     * Init - Loads settings from the json structure
      * @memberOf TableCreator
      *
      * @return {object} context The current TableCreator
      */
-    // this.init = function() {
-    //     if( $('#EditModal').length === 0 ) {
-    //         this.createModal('Edit', 'Endring', 'Lukk', 'Lagre');
-    //     }
-    //     return this;
-    // };
+    this.init = function() {
+        if (this.data.hasOwnProperty("table")) {
+            if (this.data.table.hasOwnProperty("schemaId"))
+                this.settings.schemaId = this.data.table.schemaId;
+            if (this.data.table.hasOwnProperty("instanceId"))
+                this.settings.instanceId = this.data.table.instanceId;
+            if (this.data.table.hasOwnProperty("settings"))
+                if (this.data.table.settings.hasOwnProperty("isResizable"))
+                    this.settings.isResizable = this.data.table.settings.isResizable;
+        }
+
+        return this;
+    };
+
+    this.init(); // run init()
 
     /**
      * Activate editing on the table.
@@ -174,12 +183,6 @@ function TableCreator(data, el) {
             console.warn("Url to delete rows is not set.");
         }
 
-        if (this.data.hasOwnProperty("table")) {
-            if (this.data.table.hasOwnProperty("schemaId"))
-                this.settings.schemaId = this.data.table.schemaId;
-            if (this.data.table.hasOwnProperty("instanceId"))
-                this.settings.instanceId = this.data.table.instanceId;
-        }
 
         // bind click events to undo icons
         if ($('#EditModal').length === 0) {
@@ -203,7 +206,7 @@ function TableCreator(data, el) {
         // }
         // this.addUndoLinks();
 
-        if(this.settings.isGrowable) {
+        if(this.settings.isResizable) {
             var ctx = this;
             var addRowLink = $('<a class="tcAction add" tabindex="0">Legg til ny rad</a>');
             $(this.el).append(addRowLink);
