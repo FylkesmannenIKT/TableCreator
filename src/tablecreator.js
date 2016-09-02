@@ -457,6 +457,23 @@ function TableCreator(data, el) {
             total += parseFloat(args[arg]);
         }
         return (total / args.length);
+      },
+      "div" : function(args) {
+        if (args.length === 0) return NaN;
+        if (args.length === 1) return args[0];
+        var dividend = parseFloat(args[0]);
+        for (var divisor = 1; divisor < args.length; ++divisor) {
+            dividend /= args[divisor];
+        }
+        return dividend;
+      },
+      "mult" : function(args) {
+        if (args.length < 1) return NaN;
+        var total = args[0];
+        for (var arg = 0; arg < args.length; ++arg) {
+            total *= args[arg];
+        }
+        return total;
       }
     };
 
