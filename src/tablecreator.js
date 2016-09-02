@@ -848,6 +848,7 @@ function TableCreator(data, el) {
                     valid = false;
                     continue;
                 }
+                value = value.toString();
             }
 
             // Create objects with new and old values (do not track equal values)
