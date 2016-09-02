@@ -1393,6 +1393,9 @@ function TableCreator(data, el) {
         function deleteClickEvent() {
             return ctx.saveDeleteAction(container, rowIdx);
         }
+
+        container.modal('show');
+        deletebutton.focus().select();
      };
 
      this.saveDeleteAction = function (bodyElement, rowIdx) {
