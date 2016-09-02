@@ -947,8 +947,12 @@ function TableCreator(data, el) {
             }
 
             ///////////////////// SUCCESSFUL SAVE! /////////////////////
-            row = newRow;
-            row.undo = newUndo;            // apply new undo
+            for (var attr in newRow) {
+                if (newRow.hasOwnProperty(attr)) {
+                    ctx.data.tbody[rowIdx][attr] = newRow[attr];
+                }
+            }
+            ctx.data.tbody[rowIdx].undo = newUndo;
             ctx.build().activate();        // Rebuild table
             $('#EditModal').modal('hide'); // close modal
         }
