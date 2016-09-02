@@ -637,7 +637,7 @@ function TableCreator(data, el) {
                 )
             );
 
-        $(this.el).after(modal);
+        $("body").append(modal);
 
         modal.on("keyup", function(evt) {
             if(evt.which == 13 || evt.keyCode == 13) { // if Enter is released
