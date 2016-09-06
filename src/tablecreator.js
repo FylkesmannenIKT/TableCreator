@@ -274,11 +274,11 @@ function TableCreator(data, el) {
         for (var col = 0; col < data.thead.cols.length; ++col) {
             var headerRow = data.thead.cols[col];
             var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : null;
-            var hClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
-            hClass += headerRow.type === "number" ? ' number' : '';
-            hClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
-            hClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
-            html += '<th class="' + hClass + '">' + headerTitle + '</th>';
+            var cClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
+            cClass += headerRow.type === "number" ? ' number' : '';
+            cClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
+            cClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
+            html += '<th class="' + cClass + '">' + headerTitle + '</th>';
         }
         html += '</tr>';
 
@@ -571,11 +571,11 @@ function TableCreator(data, el) {
                     var sliced = item.slice(1);
                     var cols = this.data.thead.cols;
                     for (var l = 0; l < cols.length; ++l) {
-                        if (cols[l]["id"] === item || cols[l]["id"] === sliced) {
+                        if (cols[l].id === item || cols[l].id === sliced) {
                             if (cols[l].hasOwnProperty("method")) {
-                                var rowResult = this.parseMethod(cols[l]["method"], data);
-                                rowResult = (cols[l]["id"] === sliced) ? -rowResult : rowResult;
-                                args.push(rowResult);
+                                var colResult = this.parseMethod(cols[l].method, data);
+                                colResult = (cols[l].id === sliced) ? -colResult : colResult;
+                                args.push(colResult);
                             }
                             else {
                                 // item found in column definition, but is not found
@@ -1484,7 +1484,7 @@ function TableCreator(data, el) {
             var errorMessage = "<p>Sletting ikke mulig (feil " + jqXHR.status + ").</p>";
             ctx.setModalError("#DeleteModal", errorMessage);
         }
-     }
+     };
 
     return this;
 }
