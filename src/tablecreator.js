@@ -555,7 +555,7 @@ function TableCreator(data, el) {
                     }
                 }
             }
-        } else {
+        } else {    // we deal with a row-object from tbody
             for (var k = 0; k < paramArray.length; ++k) {
                 var item = paramArray[k];
                 if(typeof item === 'number') {
@@ -566,6 +566,25 @@ function TableCreator(data, el) {
                 }
                 else if(item.charAt(0) === '-' && data.hasOwnProperty(item.slice(1))) {
                     args.push(-data[item.slice(1)]);
+                }
+                else {  // can we find attribute in column definitions?
+                    var sliced = item.slice(1);
+                    var cols = this.data.thead.cols;
+                    for (var l = 0; l < cols.length; ++l) {
+                        if (cols[l]["id"] === item || cols[l]["id"] === sliced) {
+                            if (cols[l].hasOwnProperty("method")) {
+                                var rowResult = this.parseMethod(cols[l]["method"], data);
+                                rowResult = (cols[l]["id"] === sliced) ? -rowResult : rowResult;
+                                args.push(rowResult);
+                            }
+                            else {
+                                // item found in column definition, but is not found
+                                // as property in row (data).
+                                // unaccounted state: cols[l].type === "method"
+                                args.push(0);
+                            }
+                        }
+                    }
                 }
             }
         }
