@@ -87,6 +87,10 @@ tbody tr:nth-child(2n+1) {
 .method,
 .number {
 	text-align: right;
+}
+
+td.method,
+td.number {
 	white-space: nowrap;
 }
 
