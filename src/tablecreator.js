@@ -772,8 +772,9 @@ function TableCreator(data, el) {
             var title = cols[i].title;
             var type = cols[i].type;
             var pool = null;
+            var hasMethod = cols[i].hasOwnProperty("method") ? true : false;
 
-            if (cols[i].hasOwnProperty("method") || type === 'method' || type === 'actionArray') {
+            if (hasMethod || type === 'method' || type === 'actionArray') {
                 continue;
             }
 
@@ -1336,8 +1337,9 @@ function TableCreator(data, el) {
             var title = cols[i].title;
             var type = cols[i].type;
             var pool = null;
+            var hasMethod = cols[i].hasOwnProperty("method") ? true : false;
 
-            if (cols[i].hasOwnProperty("method") || type === 'method' || type === 'actionArray') {
+            if (hasMethod || type === 'method' || type === 'actionArray') {
                 continue;
             }
 
