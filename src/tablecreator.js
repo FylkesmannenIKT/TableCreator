@@ -424,6 +424,11 @@ function TableCreator(data, el) {
         }
         html += '</table>';
 
+        if (data.hasOwnProperty("table")) 
+            if (data.table.hasOwnProperty("comment"))
+                if (typeof(data.table.comment) === 'string')
+                    html += '<div class="tcComment">' + data.table.comment + '</div>'
+
         el.innerHTML = html;
     };
 
