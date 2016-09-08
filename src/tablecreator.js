@@ -773,8 +773,9 @@ function TableCreator(data, el) {
             var type = cols[i].type;
             var pool = null;
             var hasMethod = cols[i].hasOwnProperty("method") ? true : false;
+            var editable = cols[i].hasOwnProperty("editable") ? cols[i].editable : false;
 
-            if (hasMethod || type === 'method' || type === 'actionArray') {
+            if (hasMethod || type === 'method' || type === 'actionArray' || !editable) {
                 continue;
             }
 
@@ -1338,8 +1339,9 @@ function TableCreator(data, el) {
             var type = cols[i].type;
             var pool = null;
             var hasMethod = cols[i].hasOwnProperty("method") ? true : false;
+            var editable = cols[i].hasOwnProperty("editable") ? cols[i].editable : false;
 
-            if (hasMethod || type === 'method' || type === 'actionArray') {
+            if (hasMethod || type === 'method' || type === 'actionArray' || !editable) {
                 continue;
             }
 
