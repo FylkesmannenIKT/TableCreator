@@ -470,7 +470,7 @@ function TableCreator(data, el) {
       "mult" : function(args) {
         if (args.length < 1) return NaN;
         var total = args[0];
-        for (var arg = 0; arg < args.length; ++arg) {
+        for (var arg = 1; arg < args.length; ++arg) {
             total *= args[arg];
         }
         return total;
