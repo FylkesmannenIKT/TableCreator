@@ -89,6 +89,10 @@ tbody tr:nth-child(2n+1) {
 	text-align: right;
 }
 
+.tc_table .percent {
+	text-align: center;
+}
+
 td.method,
 td.number {
 	white-space: nowrap;

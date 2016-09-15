@@ -323,7 +323,8 @@ function TableCreator(data, el) {
                     var method = column[x].method;
                     var type = column[x].hasOwnProperty("type") ? column[x].type : '';
                     var answer = this.parseMethod(method, dataLine);
-                    answer = (type == 'number') ? this.formatData(answer, 'number') : answer;
+                    answer = (type == 'number') ? this.formatData(answer, 'number') : 
+                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
                     html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
 
                 }
@@ -337,6 +338,9 @@ function TableCreator(data, el) {
                             break;
                         case 'number':
                             html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'number') + '</td>';
+                            break;
+                        case 'percent':
+                            html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'percent') + '</td>';
                             break;
                         case 'string':
                         case 'undefined':
@@ -449,8 +453,13 @@ function TableCreator(data, el) {
                 var parts = val.toString().split('.');
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 val = parts.join('.');
-                var minus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
-                val = (val.charAt(0) == '-') ? minus : val;
+                var nMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
+                val = (val.charAt(0) == '-') ? nMinus : val;
+                break;
+            case 'percent':
+                val = val.toString().isNumeric() ? val.toString() + ' %' : "0 %";    // default to zero if not a number
+                var pMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
+                val = (val.charAt(0) == '-') ? pMinus : val;
                 break;
             default:
                 break;
@@ -828,6 +837,9 @@ function TableCreator(data, el) {
                 case 'number':
                     var frac = Math.pow(10,settings.settings.decimals);
                     html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    break;
+                case 'percent':
+                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
@@ -1394,6 +1406,9 @@ function TableCreator(data, el) {
                 case 'number':
                     var frac = Math.pow(10, settings.settings.decimals);
                     html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="0"/>';
+                    break;
+                case 'percent':
+                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '"/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
