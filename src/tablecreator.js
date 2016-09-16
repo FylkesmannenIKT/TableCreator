@@ -249,26 +249,14 @@ function TableCreator(data, el) {
             }
         }
 
-        var html = '<table class="tc_table ' + tableClass + '">';
+        var html = '';
 
-        if (data.hasOwnProperty("table")){
-            var title = data.table.hasOwnProperty("title") ? data.table.title : null;
-            title = (typeof(title) === 'string') ? title : null;
+        if (data.hasOwnProperty("table"))
+            if (data.table.hasOwnProperty("title"))
+                if (typeof(data.table.title === 'string'))
+                    html += '<span>' + data.table.title + '</span>';
 
-            var reference = data.table.hasOwnProperty("reference") ? data.table.reference : null;
-            reference = (typeof(reference) === 'string') ? reference : null;
-
-            if(title !== null || reference !== null) {
-                html += '<caption>';
-                if (title !== null)
-                    html += title;
-                if (reference !== null)
-                    html += '<span style="float:right;">' + reference + '</span>';
-                html += '</caption>';
-            }
-        }
-
-        html += '<thead>';
+        html += '<table class="tc_table ' + tableClass + '"><thead>';
 
         /**
          * Iterate over rows in data.thead to create headings in the table
