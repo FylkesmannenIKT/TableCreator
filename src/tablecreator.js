@@ -416,12 +416,21 @@ function TableCreator(data, el) {
         }
         html += '</table>';
 
+        var hasComment = false;
         if (data.hasOwnProperty("table")) 
             if (data.table.hasOwnProperty("comment"))
-                if (typeof(data.table.comment) === 'string')
-                    html += '<div class="tcComment">' + data.table.comment + '</div>'
+                if (typeof(data.table.comment) === 'string') {
+                    html += '<div class="tcComment"><span class="comment">' + data.table.comment + '</span></div>';
+                    hasComment = true;
+                }
 
         el.innerHTML = html;
+
+        if (hasComment) {
+            var commentDiv = el.getElementsByClassName("tcComment")[0];
+            var tableWidth = el.getElementsByClassName("tc_table")[0].offsetWidth;
+            commentDiv.setAttribute("style","width:" + tableWidth + "px");
+        }
     };
 
     /**
