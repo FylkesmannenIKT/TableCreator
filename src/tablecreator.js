@@ -267,9 +267,9 @@ function TableCreator(data, el) {
             for (var hrCol = 0; hrCol < rowList.length; ++hrCol) {
                 var hrColumn = rowList[hrCol];
                 var colspan = hrColumn.hasOwnProperty("colspan") ? ' colspan="' + hrColumn.colspan + '"' : '';
-                var title = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
+                var ctitle = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
                 var hClass = hrColumn.hasOwnProperty("class") ? ' '+hrColumn.class : '';
-                html += '<th class="tcTableHeaders' + hClass + '"' + colspan + '>' + title + '</th>';
+                html += '<th class="tcTableHeaders' + hClass + '"' + colspan + '>' + ctitle + '</th>';
             }
             html += '</tr>';
         }
