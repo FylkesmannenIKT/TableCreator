@@ -1,91 +1,96 @@
-table {
-	width: 100%;
-	overflow-wrap: break-word;
-}
-
 .tc_table {
+	/*margin-left: auto;
+	margin-right: auto;*/
+	max-width: 100%;
+	overflow-wrap: break-word;
 	border: 1px solid black;
+	font-family: 'Roboto', sans-serif;
 }
 
 .tc_table * {
 	border-color: #ccc;
 }
 
-th {
+.tc_table th {
 	text-align: center;
     font-weight: bold;
 }
 
-th.tcTableHeaders {
+.tc_table th.tcTableHeaders {
 	text-align: left;
 	padding: 5px;
 	border-bottom: 1px solid;
 	border-right: 0 !important;
 }
 
-th.tcTableHeaders.tc-hidden-print {
+.tc_table th.tcTableHeaders.tc-hidden-print {
 	border-bottom: 0;
 }
 
-th {
+.tc_table th {
 	border-right: 1px solid;
 }
-td {
+.tc_table td {
 	border-right: 1px solid;
+	border-bottom: 1px solid #CCC;
 }
 
-th.tcActionRow,
-td.tcActionRow {
+.tc_table tr:last-child td {
+	border-bottom: 1px solid black;
+}
+
+.tc_table th.tcActionRow,
+.tc_table td.tcActionRow {
 	border-right: 1px solid;
 	text-align: right;
 }
 
-th:nth-last-child(2),
-td:nth-last-child(2) {
+.tc_table th:nth-last-child(2),
+.tc_table td:nth-last-child(2) {
 	border-right: 1px solid black;
 }
 
-td.tcRightAlign {
+.tc_table td.tcRightAlign {
 	text-align: right;
 }
 
-td.tcBold {
+.tc_table td.tcBold {
 	font-weight: bold;
 }
 
-td.tcCenterAlign {
+.tc_table td.tcCenterAlign {
 	text-align: center;
 }
 
-th.tcLeftAlign,
-td.tcLeftAlign {
+.tc_table th.tcLeftAlign,
+.tc_table td.tcLeftAlign {
 	text-align: left;
 }
 
-th,
-td {
+.tc_table th,
+.tc_table td {
 	padding: 1px 4px;
 }
 
-tfoot td {
+.tc_table tfoot td {
 	border-top: 2px solid;
 	margin-top: 3px;
 }
 
-tfoot td.tcActionRow {
+.tc_table tfoot td.tcActionRow {
 	border-top: 0;
 }
 
-tbody tr:nth-child(2n+1) {
+.tc_table tbody tr:nth-child(2n+1) {
 	background: #EEE;
 }
 
-.string {
+.tc_table .string {
 	text-align: left;
 }
 
-.method,
-.number {
+.tc_table .method,
+.tc_table .number {
 	text-align: right;
 }
 
@@ -98,29 +103,29 @@ td.number {
 	white-space: nowrap;
 }
 
-.numberCenter .number {
+.tc_table .numberCenter .number {
 	text-align: center;
 }
 
-.minus {
+.tc_table .minus {
 	color: red;
 }
 
-.tcActionRow {}
+.tc_table .tcActionRow {}
 
-a.tcAction:hover,
-a.tcAction:focus {
+.tc_table a.tcAction:hover,
+.tc_table a.tcAction:focus {
 	text-decoration: none;
 }
 
-.edit,
-.undo,
-.delete {
+.tc_table .edit,
+.tc_table .undo,
+.tc_table .delete {
 	cursor: pointer;
 	vertical-align: middle;
 	opacity: 1;
 
-	font: normal normal normal 14px/1 FontAwesome;
+	font: normal normal normal 18px/1 FontAwesome;
 
 	-webkit-box-sizing: content-box;
 	box-sizing: content-box;
@@ -132,69 +137,93 @@ a.tcAction:focus {
 	padding: 0;
 	overflow: hidden;
 	background-repeat: no-repeat;
-	font-size: 18px;
 	-ms-high-contrast-adjust: none;
 }
 
-.edit:before {
+.tc_table .edit:before {
 	content: "\f040";
 	padding-right: 1em;
 }
 
-.undo:before {
+.tc_table .undo:before {
 	content: "\f0e2";
 	padding-right: 1em;
 }
 
-.delete:before {
+.tc_table .delete:before {
 	content: "\f00d";
 	padding-right: 1em;
 }
 
-.add {
+.tcActionMenu {
+	margin-top: 0.25em;
+}
+
+.tcActionMenu a {
+	margin-right: 1em;
+    text-decoration: none;
+}
+
+.tcActionMenu a:before {
+	font: normal normal normal 18px/1 FontAwesome;
+	padding-right: 0.5em;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+.tcActionMenu a:focus,
+.tcActionMenu a:hover {
+    border-bottom: 0.25em solid black;
+    color: #fff;
+    background-color: black;
+    padding: 0.25em;
+    margin-right: 0.5em;
+}
+
+.tcAction.add {
 	margin-top: 3px;
 	display: inline-block;
 	cursor: pointer;
 	padding: 3px;
 }
 
-.add:before {
-	font: normal normal normal 14px/1 FontAwesome;
-	font-size: 18px;
+.tcActionRow.add:before {
+	/*font: normal normal normal 18px/1 FontAwesome;*/
 	content: "\f067";
-	padding-right: 1em;
-	vertical-align: middle;
+	/*padding-right: 1em;*/
+	/*vertical-align: middle;*/
+	/*text-decoration: none;*/
 }
 
-.tc_warning {
 .tcActionMenu .commentEdit:before {
     content: "\f0e6";
 }
 
+.tc_table .tc_warning {
 	border: 3px solid #FF4500;
 }
 
 @media print {
-  .tc-hidden-print {
+  .tc_table .tc-hidden-print {
     display: none;
   }
 
-  td,
-  th {
+  .tc_table td,
+  .tc_table th {
   	border-right: 1px solid;
   }
 
-  thead {
+  .tc_table thead {
   	border-bottom: 1px solid;
   }
 
-  .container {
+  .tc_table .container {
     width: 100%;
     max-width: 100%;
     min-width: 100%;
   }
 
-  .jumbotron {
+  .tc_table .jumbotron {
     display: none;
   }
 }
