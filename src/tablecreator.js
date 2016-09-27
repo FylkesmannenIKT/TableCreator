@@ -329,7 +329,7 @@ function TableCreator(data, el) {
         html += '<tr>';
         for (var col = 0; col < data.thead.cols.length; ++col) {
             var headerRow = data.thead.cols[col];
-            var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : null;
+            var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : '';
             var cClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
             cClass += headerRow.type === "number" ? ' number' : '';
             cClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
