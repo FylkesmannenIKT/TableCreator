@@ -879,8 +879,8 @@ function TableCreator(data, el) {
             }
 
             switch (type) {
+                default:
                 case 'undefined':
-                case 'default':
                 case 'string':
                     html += '<input type="text" class="form-control" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
                     break;
