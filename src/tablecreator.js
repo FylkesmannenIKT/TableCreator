@@ -1301,7 +1301,7 @@ function TableCreator(data, el) {
         var ctx = this;
 
         var validity = true;
-        var newRow = {};
+        var newRow = this.data.table.template.addTpl || {};
         var element, key, value;
         var formElements = container.find("[name^='tcEdit_']");
         formElements.each(function() {
@@ -1414,6 +1414,10 @@ function TableCreator(data, el) {
         var cols = this.data.thead.cols;
         var settings = this.data.table;
         var html = '';
+        var template = null;
+        if (settings.hasOwnProperty("template"))
+            if (settings.template.hasOwnProperty("addTpl"))
+                template = settings.template.addTpl;
 
         for (var i = 0; i < cols.length; ++i) {
             var id = cols[i].id;
@@ -1422,6 +1426,7 @@ function TableCreator(data, el) {
             var pool = null;
             var hasMethod = cols[i].hasOwnProperty("method") ? true : false;
             var editable = cols[i].hasOwnProperty("editable") ? cols[i].editable : false;
+            var value = (template !== null && template.hasOwnProperty(id)) ? template[id] : null;
 
             if (hasMethod || type === 'method' || type === 'actionArray' || !editable) {
                 continue;
@@ -1444,23 +1449,30 @@ function TableCreator(data, el) {
             }
 
             switch (type) {
+                default:
                 case 'undefined':
-                case 'default':
                 case 'string':
-                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '"/>';
+                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '" ' + 
+                        (value === null ? '' : 'value="' + value + '"' ) + '/>';
                     break;
                 case 'number':
                     var frac = Math.pow(10, settings.settings.decimals);
-                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="0"/>';
+                    html += '<input type="number" class="form-control" ' + 
+                        'step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" ' + 
+                        (value === null ? 'value="0"' : 'value="' + value + '"') + '/>';
                     break;
                 case 'percent':
-                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '"/>';
+                    html += '<input type="number" class="form-control" ' + 
+                        'step="0.1" name="tcEdit_' + id + '"' + 
+                        (value === null ? 'value="0"' : 'value="' + value + '"') + '/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
-                    html += '<option selected disabled>Velg en...</option>';
+                    var selected = (value !== null) ? ' selected' : '';
+                    html += '<option' + selected + ' disabled>Velg en...</option>';
                     for (var j = 0; j < pool.length; ++j) {
-                        html += '<option>' + pool[j] + '</option>';
+                        selected = (value === pool[j]) ? ' selected' : '';
+                        html += '<option' + selected + '>' + pool[j] + '</option>';
                     }
                     html += '</select>';
                     break;
