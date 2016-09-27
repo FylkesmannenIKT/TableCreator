@@ -113,11 +113,6 @@ a.tcAction:focus {
 	text-decoration: none;
 }
 
-.tcComment {
-    margin: 1em 3em 0;
-    font-style: italic;
-}
-
 .edit,
 .undo,
 .delete {
@@ -172,6 +167,10 @@ a.tcAction:focus {
 }
 
 .tc_warning {
+.tcActionMenu .commentEdit:before {
+    content: "\f0e6";
+}
+
 	border: 3px solid #FF4500;
 }
 
@@ -206,4 +205,19 @@ a.tcAction:focus {
     margin: 1em 0;
     font-style: italic;
     min-width: 50%;
+}
+
+.tcComment .commentEdit {
+	float: right;
+}
+
+/*.tcComment .commentEdit:before {
+	cursor: pointer;
+	content: '\f040';
+	font: normal normal normal 18px/1 FontAwesome;
+}*/
+
+#CommentModal textarea {
+	width: 100%;
+	overflow: hidden;
 }

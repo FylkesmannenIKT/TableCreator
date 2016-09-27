@@ -263,13 +263,20 @@ function TableCreator(data, el) {
 
         if(this.settings.isResizable) {
             var ctx = this;
-            var addRowLink = $('<a class="tcAction add" tabindex="0">Legg til ny rad</a>');
-            $(this.el).append(addRowLink);
+            var addRowLink = $('<a class="tcActionRow add" tabindex="0">Legg til ny rad</a>');
+            var actionMenu = $(this.el).find(".tcActionMenu");
+            actionMenu.append(addRowLink);
 
             addRowLink.on("click", function() {
                 ctx.newAction();
             });
         }
+
+        // Editable comment
+        if ($('#CommentModal').length === 0) {
+            this.createModal('Comment', 'Kommentar', 'Avbryt', 'Lagre');
+        }
+        this.addCommentLink();
 
         return this;
     };
@@ -465,21 +472,23 @@ function TableCreator(data, el) {
         }
         html += '</table>';
 
-        var hasComment = false;
-        if (data.hasOwnProperty("table")) 
-            if (data.table.hasOwnProperty("comment"))
-                if (typeof(data.table.comment) === 'string') {
-                    html += '<div class="tcComment"><span class="comment">' + data.table.comment + '</span></div>';
-                    hasComment = true;
-                }
+        html += '<div class="tcActionMenu"></div>';
+
+        html += '<div class="tcComment">' +
+                    '<span class="comment"></span>' +
+                '</div>';
 
         el.innerHTML = html;
 
-        if (hasComment) {
-            var commentDiv = el.getElementsByClassName("tcComment")[0];
-            var tableWidth = el.getElementsByClassName("tc_table")[0].offsetWidth;
-            commentDiv.setAttribute("style","width:" + tableWidth + "px");
-        }
+        var commentDiv = el.getElementsByClassName("tcComment")[0];
+        var tableWidth = el.getElementsByClassName("tc_table")[0].offsetWidth;
+        commentDiv.setAttribute("style","width:" + tableWidth + "px");
+
+        if (data.hasOwnProperty("table")) 
+            if (data.table.hasOwnProperty("comment"))
+                if (typeof(data.table.comment) === 'string') {
+                    commentDiv.querySelector(".comment").innerHTML = data.table.comment;
+                }
     };
 
     /**
@@ -1589,7 +1598,414 @@ function TableCreator(data, el) {
             var errorMessage = "<p>Sletting ikke mulig (feil " + jqXHR.status + ").</p>";
             ctx.setModalError("#DeleteModal", errorMessage);
         }
-     };
+    };
+
+    /********************************************************************************
+     *** COMMENT *** COMMENT *** COMMENT *** COMMENT *** COMMENT *** COMMENT ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** COMMENT *** COMMENT *** COMMENT *** COMMENT *** COMMENT *** COMMENT ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** COMMENT *** COMMENT *** COMMENT *** COMMENT *** COMMENT *** COMMENT ***
+     *******************************************************************************/
+
+
+    this.addCommentLink = function(){
+        var ctx = this;
+        var comment = el.getElementsByClassName("tcComment")[0];
+        if (comment === undefined) return;
+
+        var actionMenu = el.getElementsByClassName("tcActionMenu")[0];
+        var editButton = $(actionMenu).find(".commentEdit");
+        if (editButton.length === 0) {
+            editButton = $('<a class="tcActionRow commentEdit" tabindex="0">Rediger kommentar</a>');
+            $(actionMenu).append(editButton);
+        }
+
+        // var editButton = $(comment).find(".commentEdit");
+        // if (editButton.length === 0) {
+        //     editButton = $('<span class="commentEdit"></span>');
+        //     $(comment).append(editButton);
+        // }
+
+        editButton.on("click", editComment);
+
+        function editComment() {
+            ctx.spawnCommentModal();
+        }
+    };
+
+    this.spawnCommentModal = function() {
+        var ctx = this;
+        var container = $('#CommentModal');
+        var body = container.find(".modal-body");
+        // var commentArea = $('<textarea onkeyup="removeVertical(this);return false;"></textarea>');
+        var commentArea = $('<textarea onkeyup="$(this).val($(this).val().replace(/\\n/g, \'\')); this.style.height=(this.scrollHeight+2)+\'px\'; return false;"></textarea>');
+        var comment = "";
+        if(this.data.hasOwnProperty("table"))
+            if (this.data.table.hasOwnProperty("comment"))
+                comment = this.data.table.comment;
+
+        commentArea.val(this.decodeHtmlEntities(comment));
+        body.html(commentArea);
+
+        var commentButton = container.find("#CommentSave");
+        commentButton.off("click").on("click", commentClickEvent);
+
+        function commentClickEvent(){
+            return ctx.saveCommentAction(container);
+        }
+
+        container.modal('show');
+        commentArea.height(commentArea.prop('scrollHeight') + 2);
+        commentArea.focus().select();
+    };
+
+    this.saveCommentAction = function(bodyElement) {
+        var ctx = this;
+        var textarea = bodyElement.find("textarea");
+        var comment = textarea.val();
+        console.log("escapedComment");
+        console.log({comment: comment});
+
+        var ajaxData = {
+            SchemaId: this.settings.schemaId,
+            InstanceId: this.settings.instanceId,
+            RowId: -1,
+            Data: JSON.stringify({ "tcTableComment": comment })
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: this.settings.saveUrl,
+            dataType: 'json',
+            data: ajaxData,
+            success: successOnSave,
+            error: errorOnSave
+        });
+
+        function errorOnSave(jqXHR) {
+            var modal = $('#CommentModal');
+            var errorDiv = $('#CommentModal .errorDiv');
+            if (errorDiv.length === 0) {
+                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                modal.find('.modal-body').prepend(errorDiv);
+            }
+
+            switch(jqXHR.status) {
+                case 404:
+                    errorDiv.html('<p>Ikke lagret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
+                    break;
+                default:
+                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + ').</p>');
+                    break;
+            }
+
+            modal.modal('show');
+        }
+
+        function successOnSave(data) {
+            if(data.Success === false) {
+                ctx.setModalError("#CommentModal", data.Message, data.Errors);
+                return;
+            }
+
+            ctx.data.table.comment = data.SavedComment;
+            ctx.build().activate();
+            $('#CommentModal').modal('hide');
+        }
+
+
+    };
+
+    this.decodeHtmlEntities = function(s) { //https://github.com/jprichardson/string.js/blob/master/dist/string.js
+        var ctx = this;
+        // Licensed under MIT.
+        // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
+        s = s.replace(/&#(\d+);?/g, function (_, code) {
+            return String.fromCharCode(code);
+        })
+        .replace(/&#[xX]([A-Fa-f0-9]+);?/g, function (_, hex) {
+            return String.fromCharCode(parseInt(hex, 16));
+        })
+        .replace(/&([^;\W]+;?)/g, function (m, e) {
+            var ee = e.replace(/;$/, '');
+            var target = ctx.ENTITIES[e] || (e.match(/;$/) && ctx.ENTITIES[ee]);
+
+            if (typeof target === 'number') {
+                return String.fromCharCode(target);
+            }
+            else if (typeof target === 'string') {
+                return target;
+            }
+            else {
+                return m;
+            }
+        });
+        return s;
+    };
+
+    this.ENTITIES = {
+        // Licensed under MIT.
+        // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
+        "amp" : "&",
+        "gt" : ">",
+        "lt" : "<",
+        "quot" : "\"",
+        "apos" : "'",
+        "AElig" : 198,
+        "Aacute" : 193,
+        "Acirc" : 194,
+        "Agrave" : 192,
+        "Aring" : 197,
+        "Atilde" : 195,
+        "Auml" : 196,
+        "Ccedil" : 199,
+        "ETH" : 208,
+        "Eacute" : 201,
+        "Ecirc" : 202,
+        "Egrave" : 200,
+        "Euml" : 203,
+        "Iacute" : 205,
+        "Icirc" : 206,
+        "Igrave" : 204,
+        "Iuml" : 207,
+        "Ntilde" : 209,
+        "Oacute" : 211,
+        "Ocirc" : 212,
+        "Ograve" : 210,
+        "Oslash" : 216,
+        "Otilde" : 213,
+        "Ouml" : 214,
+        "THORN" : 222,
+        "Uacute" : 218,
+        "Ucirc" : 219,
+        "Ugrave" : 217,
+        "Uuml" : 220,
+        "Yacute" : 221,
+        "aacute" : 225,
+        "acirc" : 226,
+        "aelig" : 230,
+        "agrave" : 224,
+        "aring" : 229,
+        "atilde" : 227,
+        "auml" : 228,
+        "ccedil" : 231,
+        "eacute" : 233,
+        "ecirc" : 234,
+        "egrave" : 232,
+        "eth" : 240,
+        "euml" : 235,
+        "iacute" : 237,
+        "icirc" : 238,
+        "igrave" : 236,
+        "iuml" : 239,
+        "ntilde" : 241,
+        "oacute" : 243,
+        "ocirc" : 244,
+        "ograve" : 242,
+        "oslash" : 248,
+        "otilde" : 245,
+        "ouml" : 246,
+        "szlig" : 223,
+        "thorn" : 254,
+        "uacute" : 250,
+        "ucirc" : 251,
+        "ugrave" : 249,
+        "uuml" : 252,
+        "yacute" : 253,
+        "yuml" : 255,
+        "copy" : 169,
+        "reg" : 174,
+        "nbsp" : 160,
+        "iexcl" : 161,
+        "cent" : 162,
+        "pound" : 163,
+        "curren" : 164,
+        "yen" : 165,
+        "brvbar" : 166,
+        "sect" : 167,
+        "uml" : 168,
+        "ordf" : 170,
+        "laquo" : 171,
+        "not" : 172,
+        "shy" : 173,
+        "macr" : 175,
+        "deg" : 176,
+        "plusmn" : 177,
+        "sup1" : 185,
+        "sup2" : 178,
+        "sup3" : 179,
+        "acute" : 180,
+        "micro" : 181,
+        "para" : 182,
+        "middot" : 183,
+        "cedil" : 184,
+        "ordm" : 186,
+        "raquo" : 187,
+        "frac14" : 188,
+        "frac12" : 189,
+        "frac34" : 190,
+        "iquest" : 191,
+        "times" : 215,
+        "divide" : 247,
+        "OElig;" : 338,
+        "oelig;" : 339,
+        "Scaron;" : 352,
+        "scaron;" : 353,
+        "Yuml;" : 376,
+        "fnof;" : 402,
+        "circ;" : 710,
+        "tilde;" : 732,
+        "Alpha;" : 913,
+        "Beta;" : 914,
+        "Gamma;" : 915,
+        "Delta;" : 916,
+        "Epsilon;" : 917,
+        "Zeta;" : 918,
+        "Eta;" : 919,
+        "Theta;" : 920,
+        "Iota;" : 921,
+        "Kappa;" : 922,
+        "Lambda;" : 923,
+        "Mu;" : 924,
+        "Nu;" : 925,
+        "Xi;" : 926,
+        "Omicron;" : 927,
+        "Pi;" : 928,
+        "Rho;" : 929,
+        "Sigma;" : 931,
+        "Tau;" : 932,
+        "Upsilon;" : 933,
+        "Phi;" : 934,
+        "Chi;" : 935,
+        "Psi;" : 936,
+        "Omega;" : 937,
+        "alpha;" : 945,
+        "beta;" : 946,
+        "gamma;" : 947,
+        "delta;" : 948,
+        "epsilon;" : 949,
+        "zeta;" : 950,
+        "eta;" : 951,
+        "theta;" : 952,
+        "iota;" : 953,
+        "kappa;" : 954,
+        "lambda;" : 955,
+        "mu;" : 956,
+        "nu;" : 957,
+        "xi;" : 958,
+        "omicron;" : 959,
+        "pi;" : 960,
+        "rho;" : 961,
+        "sigmaf;" : 962,
+        "sigma;" : 963,
+        "tau;" : 964,
+        "upsilon;" : 965,
+        "phi;" : 966,
+        "chi;" : 967,
+        "psi;" : 968,
+        "omega;" : 969,
+        "thetasym;" : 977,
+        "upsih;" : 978,
+        "piv;" : 982,
+        "ensp;" : 8194,
+        "emsp;" : 8195,
+        "thinsp;" : 8201,
+        "zwnj;" : 8204,
+        "zwj;" : 8205,
+        "lrm;" : 8206,
+        "rlm;" : 8207,
+        "ndash;" : 8211,
+        "mdash;" : 8212,
+        "lsquo;" : 8216,
+        "rsquo;" : 8217,
+        "sbquo;" : 8218,
+        "ldquo;" : 8220,
+        "rdquo;" : 8221,
+        "bdquo;" : 8222,
+        "dagger;" : 8224,
+        "Dagger;" : 8225,
+        "bull;" : 8226,
+        "hellip;" : 8230,
+        "permil;" : 8240,
+        "prime;" : 8242,
+        "Prime;" : 8243,
+        "lsaquo;" : 8249,
+        "rsaquo;" : 8250,
+        "oline;" : 8254,
+        "frasl;" : 8260,
+        "euro;" : 8364,
+        "image;" : 8465,
+        "weierp;" : 8472,
+        "real;" : 8476,
+        "trade;" : 8482,
+        "alefsym;" : 8501,
+        "larr;" : 8592,
+        "uarr;" : 8593,
+        "rarr;" : 8594,
+        "darr;" : 8595,
+        "harr;" : 8596,
+        "crarr;" : 8629,
+        "lArr;" : 8656,
+        "uArr;" : 8657,
+        "rArr;" : 8658,
+        "dArr;" : 8659,
+        "hArr;" : 8660,
+        "forall;" : 8704,
+        "part;" : 8706,
+        "exist;" : 8707,
+        "empty;" : 8709,
+        "nabla;" : 8711,
+        "isin;" : 8712,
+        "notin;" : 8713,
+        "ni;" : 8715,
+        "prod;" : 8719,
+        "sum;" : 8721,
+        "minus;" : 8722,
+        "lowast;" : 8727,
+        "radic;" : 8730,
+        "prop;" : 8733,
+        "infin;" : 8734,
+        "ang;" : 8736,
+        "and;" : 8743,
+        "or;" : 8744,
+        "cap;" : 8745,
+        "cup;" : 8746,
+        "int;" : 8747,
+        "there4;" : 8756,
+        "sim;" : 8764,
+        "cong;" : 8773,
+        "asymp;" : 8776,
+        "ne;" : 8800,
+        "equiv;" : 8801,
+        "le;" : 8804,
+        "ge;" : 8805,
+        "sub;" : 8834,
+        "sup;" : 8835,
+        "nsub;" : 8836,
+        "sube;" : 8838,
+        "supe;" : 8839,
+        "oplus;" : 8853,
+        "otimes;" : 8855,
+        "perp;" : 8869,
+        "sdot;" : 8901,
+        "lceil;" : 8968,
+        "rceil;" : 8969,
+        "lfloor;" : 8970,
+        "rfloor;" : 8971,
+        "lang;" : 9001,
+        "rang;" : 9002,
+        "loz;" : 9674,
+        "spades;" : 9824,
+        "clubs;" : 9827,
+        "hearts;" : 9829,
+        "diams;" : 9830
+    };
+
 
     return this;
 }
