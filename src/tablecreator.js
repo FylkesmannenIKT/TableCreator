@@ -526,14 +526,16 @@ function TableCreator(data, el) {
       "sum" : function(args) {
         var total = 0;
         for (var arg = 0; arg < args.length; ++arg) {
-          total += parseFloat(args[arg]);
+            // += 0 if empty, undefined or whitespace
+            total += (!args[arg] || /^\s*$/.test(args[arg])) ? 0 : parseFloat(args[arg]);
         }
         return total;
       },
       "avg" : function(args) {
         var total = 0;
         for (var arg = 0; arg < args.length; ++arg) {
-            total += parseFloat(args[arg]);
+            // += 0 if empty, undefined or whitespace
+            total += (!args[arg] || /^\s*$/.test(args[arg])) ? 0 : parseFloat(args[arg]);
         }
         return (total / args.length);
       },
@@ -542,7 +544,8 @@ function TableCreator(data, el) {
         if (args.length === 1) return args[0];
         var dividend = parseFloat(args[0]);
         for (var divisor = 1; divisor < args.length; ++divisor) {
-            dividend /= args[divisor];
+            // /= 1 if empty, undefined or whitespace
+            dividend /= (!args[divisor] || /^\s*$/.test(args[divisor])) ? 1 : args[divisor];
         }
         return dividend;
       },
@@ -550,7 +553,8 @@ function TableCreator(data, el) {
         if (args.length < 1) return NaN;
         var total = args[0];
         for (var arg = 1; arg < args.length; ++arg) {
-            total *= args[arg];
+            // *= 1 if empty, undefined or whitespace
+            total *= (!args[arg] || /^\s*$/.test(args[arg])) ? 1 : args[arg];
         }
         return total;
       }
