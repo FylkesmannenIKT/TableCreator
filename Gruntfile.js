@@ -19,7 +19,7 @@ module.exports = function(grunt) {
       },
       target: {
         files: {
-          'build/<%= pkg.name %>.min.css': [ 'src/<%= pkg.name %>.css', 'src/reset.css' ]
+          'build/<%= pkg.name %>.min.css': [ 'src/<%= pkg.name %>.css' ]
         }
       }
     },
@@ -66,7 +66,7 @@ module.exports = function(grunt) {
             src: ['src/tablecreator.js', 'src/polyfiller-custom.js'],
             dest: '/Project/Nokkeltall/Nokkeltall/Scripts/tablecreator/',
           },{
-            src: ['src/tablecreator.css', 'src/reset.css'],
+            src: ['src/tablecreator.css'],
             dest: '/Project/Nokkeltall/Nokkeltall/Content/tablecreator/',
           },{
             expand: true, 
