@@ -47,6 +47,55 @@ function TableCreator(data, el) {
 
     /**
      * Object containing json structure defining table with content.
+     * @example
+     *  {
+     *      "table": {
+     *          "id": "unique_name",
+     *          "title": "headline",
+     *          "schemaId": # to identify type of schema,
+     *          "instanceId": # to identify instance of schema,
+     *          "pool": {} to contain key->array where key is column ID and array contains dropdown string values,
+     *          "settings": {
+     *              "decimals": # of decimals in numbers,
+     *              "isResizable": boolean (is it possible to add and remove rows?)
+     *          },
+     *          "template": {
+     *              "addTpl": {} rowobject containing key->value where key is column ID and value is column value in that row,
+     *              "setTpl": [] array containing multiple rowobjects
+     *          }
+     *      },
+     *      "thead": {
+     *          "rows": [
+     *              [{th element where "title" is content, "colspan" is a # for html colspan}] array with multiple td elements
+     *          ] arrays with multiple tr elements,
+     *          "cols": [
+     *              {} column specification object:
+     *                  "id": "name_to_uniquely_ID_column",
+     *                  "title": "text in th element",
+     *                  "class": "css class to apply to heading",
+     *                  "type": one of the following ["string", "number", "percent", "dropdown", "method"] default:string,
+     *                  "method": "sum(col1,div(col2,100))" - string of calculations; available [sum, avg, mult, div]
+     *                  "editable": boolean - column can only be edited if set to true, default:false,
+     *              ,{} Action object [optional]: {
+     *                  "id": "actions",
+     *                   "class": "tcActionRow hide tc-hidden-print",
+     *                  "type": "actionArray",
+     *                  "actions": [] array with name of actions, can be multiple of ["undo", "edit", "delete"]
+     *              }
+     *          ] array with column specification objects
+     *      },
+     *      "tfoot": {
+     *          "rows": [[]] arrayarray like rows in thead.rows,
+     *          "cols": [{}] objectarray similar to thead.cols (one object consecutively for each column)
+     *          {
+     *              "title": "text in th element",
+     *              "class": "CSS class for th element",
+     *              "method": similar to thead.cols.method, but calculates all values of a thead.cols.id
+     *          }
+     *      },
+     *      "tbody": [{}] Array of data entities (one row if horizontal layout, else one column if vertical layout)
+     *          [{ "columnId1": "columnvalue 1", "columnId2": 2 }, {...}]
+     *  }
      * @memberOf TableCreator
      */
     this.data = data;
