@@ -505,6 +505,14 @@ function TableCreator(data, el) {
         var val = value;
         switch(type) {
             case 'number':
+
+                var precision = 2;
+                if (typeof this.settings.precision === 'number')
+                    precision = this.settings.precision;
+
+                val = parseFloat(val).toFixed(precision);
+                val = isNaN(val) ? "" : val;
+
                 var parts = val.toString().split('.');
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 val = parts.join('.');
