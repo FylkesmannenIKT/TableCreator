@@ -888,10 +888,12 @@ function TableCreator(data, el) {
                 html += '<div class="col-md-8">';
             }
 
-            if(settings.pool.hasOwnProperty(id)) {
-                if (settings.pool[id].constructor === Array) {
-                    type = 'dropdown';
-                    pool = settings.pool[id];
+            if (settings.hasOwnProperty("pool")) {
+                if(settings.pool.hasOwnProperty(id)) {
+                    if (settings.pool[id].constructor === Array) {
+                        type = 'dropdown';
+                        pool = settings.pool[id];
+                    }
                 }
             }
 
