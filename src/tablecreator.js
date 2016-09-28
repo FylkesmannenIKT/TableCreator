@@ -281,6 +281,168 @@ function TableCreator(data, el) {
         return this;
     };
 
+    this.buildTable = function (data, el) {
+        var tableClass = "";
+        var title = null;
+        if (data.hasOwnProperty("table")) {
+            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : "";
+
+            if (data.table.hasOwnProperty("settings")) {
+                if (data.table.settings.hasOwnProperty("decimals")) {
+                    if (typeof data.table.settings.decimals === 'number') {
+                        this.settings.precision = data.table.settings.decimals;
+                    }
+                }
+            }
+
+            if (data.table.hasOwnProperty("title")) {
+                if (typeof data.table.title === 'string')
+                    title = data.table.title;
+            }
+        }
+
+        var html = "";
+        if (title !== null) {
+            html += '<span>' + title + '</span>';
+        }
+
+        html += '<table class="tc_table ' + tableClass + '">';
+
+        /*********************************************************************/
+        /************************* HORIZONTAL ********************************/
+        /*********************************************************************/
+
+        var hSpans = data.thead.rows || [];
+        var hSpanCounter = [];  // array to keep track of index to current hSpan
+        var hSpanRest = [];     // array to keep track of remaining rows for current hSpan ([3,2,1] for colspan="3")
+
+        for (var column = 0; column < data.thead.cols.length; ++column) {
+            html += '<tr>';
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // print <th> for rowspan before row-definition
+
+            var rTitle, hClass, item, itemData, id, type, value, hasMethod;
+            var hSpanIdx, hSpanLeft, rowspan;
+
+            for (var hCol = 0; hCol < hSpans.length; ++hCol) {
+                hSpanIdx = hSpanCounter[hCol] || 0;
+                hSpanLeft = hSpanRest[hCol] || 0;
+                item = hSpans[hCol][hSpanIdx];
+
+                if (hSpanLeft > 0) {
+                    --hSpanRest[hCol];
+                    continue;
+                }
+
+                rowspan = item.hasOwnProperty("colspan") ? ' rowspan="' + item.colspan + '"' : '';
+                rTitle = item.hasOwnProperty("title") ? item.title : '';
+                hClass = item.hasOwnProperty("class") ? ' ' + item.class : '';
+                html += '<th class="tcTableHeaders' + hClass + '"' + rowspan + '>' + rTitle + '</th>';
+
+                hSpanCounter[hCol] = hSpanCounter[hCol] + 1 || 1;   // increment 1 or init to 1
+                hSpanRest[hCol] = (item.colspan - 1) || 0;
+            }
+
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // print <th> for row name
+            item = data.thead.cols[column];
+            rTitle = item.hasOwnProperty("title") ? item.title : '';
+            hClass = item.hasOwnProperty("class") ? ' ' + item.class : '';
+            type = item.hasOwnProperty("type") ? item.type : "string";
+            // hClass += (type === "number") ? ' number' : ' tcLeftAlign';
+            html += '<th class="' + hClass + ' tcLeftAlign">' + rTitle + '</th>';
+
+            id = item.id;
+            hasMethod = item.hasOwnProperty("method");
+
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // print <td> for n'th item where n=tbody[x] and value like tbody[x][item]
+            var method, answer;
+
+            for (var dataItr = 0; dataItr < data.tbody.length; ++dataItr) {
+                itemData = data.tbody[dataItr];
+                value = itemData.hasOwnProperty(id) ? itemData[id] : '';
+                if (hasMethod) {
+                    method = item.method;
+                    answer = this.parseMethod(method, itemData);
+                    answer = (type == 'number') ? this.formatData(answer, 'number') :
+                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
+                    html += '<td class="' + type + ' ' + hClass + '">' + answer + '</td>';
+                }
+                else {
+                    switch(type) {
+                        case 'method':
+                            value = this.parseMethod(value, itemData);
+                            html += '<td class="' + type + ' ' + hClass + '">' + this.formatData(value, 'number') + '</td>';
+                            break;
+                        case 'number':
+                            html += '<td class="' + type + ' ' + hClass + '">' + this.formatData(value, 'number') + '</td>';
+                            break;
+                        case 'percent':
+                            html += '<td class="' + type + ' ' + hClass + '">' + this.formatData(value, 'percent') + '</td>';
+                            break;
+                        case 'string':
+                        case 'undefined':
+                            html += '<td class="tcLeftAlign ' + type + ' ' + hClass + '">' + value + '</td>';
+                            break;
+                        case 'index':
+                            html += '<td>' + (dataItr+1) + '</td>';
+                            break;
+                        case 'actionArray':
+                            html += '<td class="tcActionRow hide ' + hClass + '">';
+
+                            // Add spinner if column is cached while saving to server
+                            var isSaving = itemData.hasOwnProperty("isSaving") ? itemData.isSaving : false;
+                            if(isSaving === true ) {
+                                html += '<i class="fa fa-refresh fa-spin"></i>';
+                            }
+
+                            // add action icons for a column
+                            var actions = item.hasOwnProperty("actions") ? item.actions : null;
+                            if(actions !== null && actions.constructor === Array ) {
+                                for(var a = 0; a < actions.length; ++a) {
+                                    switch(actions[a]) {
+                                        case 'undo':
+                                            if(itemData.hasOwnProperty("undo") && itemData.undo !== null) {
+                                                html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + dataItr + '" tabindex="0">angre</a>';
+                                            }
+                                            break;
+                                        case 'edit':
+                                            html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + dataItr + '" tabindex="0">rediger</a>';
+                                            break;
+                                        case 'delete':
+                                            if (this.settings.isResizable)
+                                                html += '<a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + dataItr + '" tabindex="0">slett</a>';
+                                            break;
+                                    }
+                                }
+                            }
+
+                            html += '</td>';
+                            break;
+                        default:
+                            html += '<td class="' + type + ' ' + hClass + '">' + value + '</td>';
+                    }
+                }
+            }
+
+
+            html += '</tr>';
+        }
+
+        /*********************************************************************/
+        /*********************************************************************/
+        /*********************************************************************/
+
+        html += '</table>';
+
+        el.innerHTML = html;
+
+        // return this;
+    };
+
     /** 
      * Building a html table from data and put it the given element.
      *
@@ -289,7 +451,7 @@ function TableCreator(data, el) {
      * @return void
      * @memberOf TableCreator
      */
-    this.buildTable = function (data, el) {
+    this.buildTableHorizontal = function (data, el) {
         var tableClass = '';
         if(data.hasOwnProperty("table")) {
             tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : '';
