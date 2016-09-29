@@ -57,7 +57,8 @@ function TableCreator(data, el) {
      *          "pool": {} to contain key->array where key is column ID and array contains dropdown string values,
      *          "settings": {
      *              "decimals": # of decimals in numbers,
-     *              "isResizable": boolean (is it possible to add and remove rows?)
+     *              "isResizable": boolean (is it possible to add and remove rows?),
+     *              "dataOrientation": string - "vertical" if vertical table, else a horizontal table is given
      *          },
      *          "template": {
      *              "addTpl": {} rowobject containing key->value where key is column ID and value is column value in that row,
@@ -85,7 +86,6 @@ function TableCreator(data, el) {
      *          ] array with column specification objects
      *      },
      *      "tfoot": {
-     *          "rows": [[]] arrayarray like rows in thead.rows,
      *          "cols": [{}] objectarray similar to thead.cols (one object consecutively for each column)
      *          {
      *              "title": "text in th element",
@@ -281,11 +281,23 @@ function TableCreator(data, el) {
         return this;
     };
 
+    /** 
+     * Building a html table from data and putting it into the given element.
+     *
+     * @param {object} data - The data structure with table structure and table data.
+     * @param {object} el - The element where the finished table should be pasted to.
+     * @return void
+     * @memberOf TableCreator
+     */
     this.buildTable = function (data, el) {
         var tableClass = "";
-        var title = null;
+        var title = "";
+        var isVertical = false; // default value
         if (data.hasOwnProperty("table")) {
-            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : "";
+            if (data.table.hasOwnProperty("title")) {
+                if (typeof data.table.title === 'string')
+                    title = data.table.title;
+            }
 
             if (data.table.hasOwnProperty("settings")) {
                 if (data.table.settings.hasOwnProperty("decimals")) {
@@ -293,25 +305,166 @@ function TableCreator(data, el) {
                         this.settings.precision = data.table.settings.decimals;
                     }
                 }
+
+                isVertical = data.table.settings.hasOwnProperty("dataOrientation") && 
+                    data.table.settings.dataOrientation == "vertical";
+
+                tableClass += isVertical ? " vertical" : " horizontal";
             }
 
-            if (data.table.hasOwnProperty("title")) {
-                if (typeof data.table.title === 'string')
-                    title = data.table.title;
-            }
+            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : "";
         }
 
         var html = "";
-        if (title !== null) {
+        if (title !== "") {
             html += '<span>' + title + '</span>';
         }
 
         html += '<table class="tc_table ' + tableClass + '">';
 
-        /*********************************************************************/
-        /************************* HORIZONTAL ********************************/
-        /*********************************************************************/
+        if (isVertical) {
+            html += this.printVerticalTableContent(data);
+        } else {
+            html += this.printHorizontalTableContent(data);
+        }
 
+        html += '</table>';
+        html += '<div class="tcActionMenu"></div>';
+        html += '<div class="tcComment">' +
+                    '<span class="comment"></span>' +
+                '</div>';
+
+        el.innerHTML = html;
+
+        var commentDiv = el.getElementsByClassName("tcComment")[0];
+        var tableWidth = el.getElementsByClassName("tc_table")[0].offsetWidth;
+        commentDiv.setAttribute("style","width:" + tableWidth + "px");
+
+        if (data.hasOwnProperty("table")) 
+            if (data.table.hasOwnProperty("comment"))
+                if (typeof(data.table.comment) === 'string')
+                    commentDiv.querySelector(".comment").innerHTML = data.table.comment;
+    };
+
+
+    /** 
+     * Building a html string with the content for a table, such that the data are
+     * displayed horizontally.
+     *
+     * @param {object} data - The data structure with table structure and table data.
+     * @return string - html string starting with &lt;thead&gt;, ending with &lt;/tfoot&gt;
+     * @memberOf TableCreator
+     */
+    this.printHorizontalTableContent = function(data) {
+        var html = "<thead>";
+        /**
+         * Iterate over rows in data.thead to create headings in the table
+         */
+        for (var headrow = 0; headrow < data.thead.rows.length; ++headrow) {
+            var rowList = data.thead.rows[headrow];
+            html += '<tr>';
+            for (var hrCol = 0; hrCol < rowList.length; ++hrCol) {
+                var hrColumn = rowList[hrCol];
+                var colspan = hrColumn.hasOwnProperty("colspan") ? ' colspan="' + hrColumn.colspan + '"' : '';
+                var ctitle = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
+                var hClass = hrColumn.hasOwnProperty("class") ? ' '+hrColumn.class : '';
+                html += '<th class="tcTableHeaders' + hClass + '"' + colspan + '>' + ctitle + '</th>';
+            }
+            html += '</tr>';
+        }
+
+        /**
+         * Iterate over cols in data.thead to create column headings in thead of table
+         */
+        html += '<tr>';
+        for (var col = 0; col < data.thead.cols.length; ++col) {
+            var headerRow = data.thead.cols[col];
+            var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : '';
+            var cClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
+            cClass += headerRow.type === "number" ? ' number' : '';
+            cClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
+            cClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
+            html += '<th class="' + cClass + '">' + headerTitle + '</th>';
+        }
+        html += '</tr>';
+
+        /**
+         * Iterate over the array in tbody to create one tbody row for each contained object.
+         */
+        html += '</thead><tbody>';
+        for (var line = 0; line < data.tbody.length; ++line)
+        {
+            var dataLine = data.tbody[line];
+
+            html += '<tr>';
+
+            var column = data.thead.cols;
+
+            for (var x = 0; x < column.length; ++x)
+            {
+                var id = column[x].id;
+                var value = dataLine.hasOwnProperty(id) ? dataLine[id] : "";
+                var cls = column[x].hasOwnProperty("class") ? column[x].class : "";
+                if (column[x].hasOwnProperty("method"))
+                {
+                    var method = column[x].method;
+                    var type = column[x].hasOwnProperty("type") ? column[x].type : '';
+                    var answer = this.parseMethod(method, dataLine);
+                    answer = (type == 'number') ? this.formatData(answer, 'number') : 
+                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
+                    html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
+
+                }
+                else
+                {
+                    html += this.printCell(column[x].type, cls, value, column[x], dataLine, line);
+                }
+            }
+            html += '</tr>';
+        }
+        html += '</tbody>';
+
+        /**
+         * If tfoot has an array in cols property, iterate over it to produce bottom row (possibly with calculations)
+         */
+        if(data.tfoot.hasOwnProperty("cols") && Array.isArray(data.tfoot.cols) && data.tfoot.cols.length > 0) {
+            html += '<tfoot><tr>';
+            for (var y = 0; y < data.tfoot.cols.length; ++y)
+            {
+                var fCol = data.tfoot.cols[y];
+                var globalClass = '';
+                var footValue;
+                if(y < data.thead.cols.length) {
+                    globalClass = data.thead.cols[y].hasOwnProperty("class") ? data.thead.cols[y].class : '';
+                }
+                var localClass = fCol.hasOwnProperty("class") ? fCol.class : '';
+                if(fCol.hasOwnProperty("title")) {
+                    html += '<td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '</td>';
+                }
+                else if (fCol.hasOwnProperty("method")) {
+                    footValue = this.parseMethod(fCol.method, data);
+                    html += '<td class="' + globalClass + ' ' + localClass + ' number">' + this.formatData(footValue, 'number') + '</td>';
+                }
+                else {
+                    html += '<td class="' + globalClass + '"></td>';
+                }
+            }
+            html += '</tfoot></tr>';
+        }
+
+        return html;        
+    };
+
+    /** 
+     * Building a html string with the content for a table, such that the data are
+     * displayed vertically.
+     *
+     * @param {object} data - The data structure with table structure and table data.
+     * @return string - html string starting with &lt;tbody&gt;, ending with &lt;/tbody&gt;
+     * @memberOf TableCreator
+     */
+    this.printVerticalTableContent = function(data) {
+        var html = "";
         var hSpans = data.thead.rows || [];
         var hSpanCounter = [];  // array to keep track of index to current hSpan
         var hSpanRest = [];     // array to keep track of remaining rows for current hSpan ([3,2,1] for colspan="3")
@@ -372,285 +525,111 @@ function TableCreator(data, el) {
                     html += '<td class="' + type + ' ' + hClass + '">' + answer + '</td>';
                 }
                 else {
-                    switch(type) {
-                        case 'method':
-                            value = this.parseMethod(value, itemData);
-                            html += '<td class="' + type + ' ' + hClass + '">' + this.formatData(value, 'number') + '</td>';
-                            break;
-                        case 'number':
-                            html += '<td class="' + type + ' ' + hClass + '">' + this.formatData(value, 'number') + '</td>';
-                            break;
-                        case 'percent':
-                            html += '<td class="' + type + ' ' + hClass + '">' + this.formatData(value, 'percent') + '</td>';
-                            break;
-                        case 'string':
-                        case 'undefined':
-                            html += '<td class="tcLeftAlign ' + type + ' ' + hClass + '">' + value + '</td>';
-                            break;
-                        case 'index':
-                            html += '<td>' + (dataItr+1) + '</td>';
-                            break;
-                        case 'actionArray':
-                            html += '<td class="tcActionRow hide ' + hClass + '">';
-
-                            // Add spinner if column is cached while saving to server
-                            var isSaving = itemData.hasOwnProperty("isSaving") ? itemData.isSaving : false;
-                            if(isSaving === true ) {
-                                html += '<i class="fa fa-refresh fa-spin"></i>';
-                            }
-
-                            // add action icons for a column
-                            var actions = item.hasOwnProperty("actions") ? item.actions : null;
-                            if(actions !== null && actions.constructor === Array ) {
-                                for(var a = 0; a < actions.length; ++a) {
-                                    switch(actions[a]) {
-                                        case 'undo':
-                                            if(itemData.hasOwnProperty("undo") && itemData.undo !== null) {
-                                                html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + dataItr + '" tabindex="0">angre</a>';
-                                            }
-                                            break;
-                                        case 'edit':
-                                            html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + dataItr + '" tabindex="0">rediger</a>';
-                                            break;
-                                        case 'delete':
-                                            if (this.settings.isResizable)
-                                                html += '<a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + dataItr + '" tabindex="0">slett</a>';
-                                            break;
-                                    }
-                                }
-                            }
-
-                            html += '</td>';
-                            break;
-                        default:
-                            html += '<td class="' + type + ' ' + hClass + '">' + value + '</td>';
-                    }
+                    html += this.printCell(type, hClass, value, item, itemData, dataItr);
                 }
             }
 
+            /////////////////////////////////////////////////////////////////////////////////////////////////
+            // print <td> for tfoot values
+            if (data.hasOwnProperty("tfoot") &&
+                data.tfoot.hasOwnProperty("cols") &&
+                Array.isArray(data.tfoot.cols) &&
+                data.tfoot.cols.length > 0) {
+
+                if (column < data.tfoot.cols.length) {
+                    var footObject = data.tfoot.cols[column];
+                    var foClass = (footObject.hasOwnProperty("class")) ? ' ' + footObject.class : '';
+
+                    var fClass = hClass + foClass;
+                    if (footObject.hasOwnProperty("title"))
+                        html += '<td class="' + fClass + ' string">' + footObject.title + '</td>';
+                    else if (footObject.hasOwnProperty("method")) {
+                        value = this.parseMethod(footObject.method, data);
+                        html += '<td class="' + fClass + ' number">' + this.formatData(value, 'number') + '</td>';
+                    }
+                    else {
+                        html += '<td class="' + fClass + '"></td>';
+                    }
+                }
+                else {
+                    html += '<td class="' + hClass + '"></td>';
+                }
+
+            }
 
             html += '</tr>';
-        }
+        } // end for each thead.col
 
-        /*********************************************************************/
-        /*********************************************************************/
-        /*********************************************************************/
-
-        html += '</table>';
-
-        el.innerHTML = html;
-
-        // return this;
+        return html;
     };
 
     /** 
-     * Building a html table from data and put it the given element.
+     * Building a <td> html string with the content for a cell. Different types of data is parsed properly.
      *
-     * @param {object} data - The data structure with table structure and table data.
-     * @param {object} el - The element where the finished table should be pasted to.
-     * @return void
+     * @param {string} cType - the type of data: one of ['method', 'number', 'percent', 'string', undefined, 'index', 'actionArray']
+     * @param {string} cClass - classes that will be written in the class="" attribute
+     * @param {var} cValue - Value for the cell
+     * @param {object} item - column object defining stuff for the cell
+     * @param {object} itemData - data object containing stuff for the cell
+     * @param {number} refIdx - data object index in data.tbody[]
+     * @return string - html string starting with &lt;td&gt;, ending with &lt;/td&gt;
      * @memberOf TableCreator
      */
-    this.buildTableHorizontal = function (data, el) {
-        var tableClass = '';
-        if(data.hasOwnProperty("table")) {
-            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : '';
-        }
+    this.printCell = function (cType, cClass, cValue, item, itemData, refIdx) {
+        var html = "";
+        switch(cType) {
+            case 'method':
+                cValue = this.parseMethod(cValue, itemData);
+                html += '<td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'number') + '</td>';
+                break;
+            case 'number':
+                html += '<td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'number') + '</td>';
+                break;
+            case 'percent':
+                html += '<td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'percent') + '</td>';
+                break;
+            default:
+            case 'string':
+            case undefined:
+                html += '<td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '</td>';
+                break;
+            case 'index':
+                html += '<td>' + (refIdx+1) + '</td>';
+                break;
+            case 'actionArray':
+                html += '<td class="tcActionRow hide ' + cClass + '">';
 
-        if (data.hasOwnProperty("table")) {
-            if (data.table.hasOwnProperty("settings")) {
-                if (data.table.settings.hasOwnProperty("decimals")) {
-                    if (typeof data.table.settings.decimals === 'number') {
-                        this.settings.precision = data.table.settings.decimals;
-                    }
+                // Add spinner if column is cached while saving to server
+                var isSaving = itemData.hasOwnProperty("isSaving") ? itemData.isSaving : false;
+                if(isSaving === true ) {
+                    html += '<i class="fa fa-refresh fa-spin"></i>';
                 }
-            }
-        }
 
-        var html = '';
-
-        if (data.hasOwnProperty("table"))
-            if (data.table.hasOwnProperty("title"))
-                if (typeof(data.table.title === 'string'))
-                    html += '<span>' + data.table.title + '</span>';
-
-        html += '<table class="tc_table ' + tableClass + '"><thead>';
-
-        /**
-         * Iterate over rows in data.thead to create headings in the table
-         */
-        for (var headrow = 0; headrow < data.thead.rows.length; ++headrow) {
-            var rowList = data.thead.rows[headrow];
-            html += '<tr>';
-            for (var hrCol = 0; hrCol < rowList.length; ++hrCol) {
-                var hrColumn = rowList[hrCol];
-                var colspan = hrColumn.hasOwnProperty("colspan") ? ' colspan="' + hrColumn.colspan + '"' : '';
-                var ctitle = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
-                var hClass = hrColumn.hasOwnProperty("class") ? ' '+hrColumn.class : '';
-                html += '<th class="tcTableHeaders' + hClass + '"' + colspan + '>' + ctitle + '</th>';
-            }
-            html += '</tr>';
-        }
-
-        /**
-         * Iterate over cols in data.thead to create column headings in thead of table
-         */
-        html += '<tr>';
-        for (var col = 0; col < data.thead.cols.length; ++col) {
-            var headerRow = data.thead.cols[col];
-            var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : '';
-            var cClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
-            cClass += headerRow.type === "number" ? ' number' : '';
-            cClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
-            cClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
-            html += '<th class="' + cClass + '">' + headerTitle + '</th>';
-        }
-        html += '</tr>';
-
-        /**
-         * Iterate over the array in tbody to create one tbody row for each contained object.
-         */
-        html += '</thead><tbody>';
-        for (var line = 0; line < data.tbody.length; ++line)
-        {
-            var dataLine = data.tbody[line];
-
-            html += '<tr>';
-
-            var column = data.thead.cols;
-
-            for (var x = 0; x < column.length; ++x)
-            {
-                var id = column[x].id;
-                var value = dataLine.hasOwnProperty(id) ? dataLine[id] : "";
-                var cls = column[x].hasOwnProperty("class") ? column[x].class : "";
-                if (column[x].hasOwnProperty("method"))
-                {
-                    var method = column[x].method;
-                    var type = column[x].hasOwnProperty("type") ? column[x].type : '';
-                    var answer = this.parseMethod(method, dataLine);
-                    answer = (type == 'number') ? this.formatData(answer, 'number') : 
-                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
-                    html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
-
-                }
-                else if (column[x].hasOwnProperty("type"))
-                {
-                    switch(column[x].type)
-                    {
-                        case 'method':
-                            value = this.parseMethod(value, dataLine);
-                            html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'number') + '</td>';
-                            break;
-                        case 'number':
-                            html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'number') + '</td>';
-                            break;
-                        case 'percent':
-                            html += '<td class="' + column[x].type + ' ' + cls + '">' + this.formatData(value, 'percent') + '</td>';
-                            break;
-                        case 'string':
-                        case 'undefined':
-                            html += '<td class="tcLeftAlign ' + column[x].type + ' ' + cls + '">' + value + '</td>';
-                            break;
-                        case 'index':
-                            html += '<td>' + (line+1) + '</td>';
-                            break;
-                        case 'actionArray':
-                            html += '<td class="tcActionRow hide ' + cls + '">';
-
-                            // Add spinner if column is cached while saving to server
-                            var isSaving = dataLine.hasOwnProperty("isSaving") ? dataLine.isSaving : false;
-                            if(isSaving === true ) {
-                            // var cache = dataLine.hasOwnProperty("cache") ? dataLine.cache : null;
-                            // if(cache !== null) {
-                                html += '<i class="fa fa-refresh fa-spin"></i>';
-                            }
-
-                            // add action icons for a column
-                            var actions = column[x].hasOwnProperty("actions") ? column[x].actions : null;
-                            if(actions !== null && actions.constructor === Array ) {
-                                for(var a = 0; a < actions.length; ++a) {
-                                    switch(actions[a]) {
-                                        case 'undo':
-                                            if(dataLine.hasOwnProperty("undo") && dataLine.undo !== null) {
-                                                html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + line + '" tabindex="0">angre</a>';
-                                            }
-                                            break;
-                                        case 'edit':
-                                            html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + line + '" tabindex="0">rediger</a>';
-                                            break;
-                                        case 'delete':
-                                            if (this.settings.isResizable)
-                                                html += '<a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + line + '" tabindex="0">slett</a>';
-                                            break;
-                                    }
+                // add action icons for a column
+                var actions = item.hasOwnProperty("actions") ? item.actions : null;
+                if(actions !== null && actions.constructor === Array ) {
+                    for(var a = 0; a < actions.length; ++a) {
+                        switch(actions[a]) {
+                            case 'undo':
+                                if(itemData.hasOwnProperty("undo") && itemData.undo !== null) {
+                                    html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + refIdx + '" tabindex="0">angre</a>';
                                 }
-                            }
-
-                            html += '</td>';
-                            break;
-                        default:
-                            html += '<td class="' + column[x].type + ' ' + cls + '">' + value + '</td>';
+                                break;
+                            case 'edit':
+                                html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + refIdx + '" tabindex="0">rediger</a>';
+                                break;
+                            case 'delete':
+                                if (this.settings.isResizable)
+                                    html += '<a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + refIdx + '" tabindex="0">slett</a>';
+                                break;
+                        }
                     }
                 }
-                else
-                {
-                    html += '<td class="tcLeftAlign ' + cls + '"></td>';
-                }
-            }
 
-            // html += '<td><span class="edit">rediger</span></td>';
-
-            html += '</tr>';
+                html += '</td>';
+                break;
         }
-        html += '</tbody>';
-
-        /**
-         * If tfoot has an array in cols property, iterate over it to produce bottom row (possibly with calculations)
-         */
-        if(data.tfoot.hasOwnProperty("cols") && Array.isArray(data.tfoot.cols) && data.tfoot.cols.length > 0) {
-            html += '<tfoot><tr>';
-            for (var y = 0; y < data.tfoot.cols.length; ++y)
-            {
-                var fCol = data.tfoot.cols[y];
-                var globalClass = '';
-                var footValue;
-                if(y < data.thead.cols.length) {
-                    globalClass = data.thead.cols[y].hasOwnProperty("class") ? data.thead.cols[y].class : '';
-                }
-                var localClass = fCol.hasOwnProperty("class") ? fCol.class : '';
-                if(fCol.hasOwnProperty("title")) {
-                    html += '<td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '</td>';
-                }
-                else if (fCol.hasOwnProperty("method")) {
-                    footValue = this.parseMethod(fCol.method, data);
-                    html += '<td class="' + globalClass + ' ' + localClass + ' number">' + this.formatData(footValue, 'number') + '</td>';
-                }
-                else {
-                    html += '<td class="' + globalClass + '"></td>';
-                }
-            }
-            html += '</tfoot></tr>';
-        }
-        html += '</table>';
-
-        html += '<div class="tcActionMenu"></div>';
-
-        html += '<div class="tcComment">' +
-                    '<span class="comment"></span>' +
-                '</div>';
-
-        el.innerHTML = html;
-
-        var commentDiv = el.getElementsByClassName("tcComment")[0];
-        var tableWidth = el.getElementsByClassName("tc_table")[0].offsetWidth;
-        commentDiv.setAttribute("style","width:" + tableWidth + "px");
-
-        if (data.hasOwnProperty("table")) 
-            if (data.table.hasOwnProperty("comment"))
-                if (typeof(data.table.comment) === 'string') {
-                    commentDiv.querySelector(".comment").innerHTML = data.table.comment;
-                }
+        return html;
     };
 
     /**
@@ -1120,6 +1099,7 @@ function TableCreator(data, el) {
         inputs.each(function(index, inputElement) {
             element = $(inputElement);
             key = element.attr('name').slice("tcEdit_".length);
+            if (element.val().length === 0) return;
             value = element.val();
             type = element.attr('type');
             dictionary.push({ "key": key, "value": value, "type": type });
