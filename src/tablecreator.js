@@ -1054,7 +1054,7 @@ function TableCreator(data, el) {
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
                     for (var j = 0; j < pool.length; ++j) {
-                        var selected = (row[id] === pool[j]) ? ' selected="selected"' : '';
+                        var selected = (this.decodeHtmlEntities(row[id]) === pool[j]) ? ' selected="selected"' : '';
                         html += '<option' + selected + '>' + pool[j] + '</option>';
                     }
                     html += '</select>';
@@ -1172,14 +1172,14 @@ function TableCreator(data, el) {
         var newUndo = { undo: row.undo };
         for (var y in oldValues) {
             if(oldValues.hasOwnProperty(y)) {
-                newUndo[y] = oldValues[y];
+                newUndo[y] = this.decodeHtmlEntities(oldValues[y]);
             }
         }
 
         var newRow = {};
         for (var z in newValues) {
             if (newValues.hasOwnProperty(z)) {
-                newRow[z] = newValues[z];
+                newRow[z] = this.decodeHtmlEntities(newValues[z]);
             }
         }
 
@@ -1875,6 +1875,7 @@ function TableCreator(data, el) {
 
     this.decodeHtmlEntities = function(s) { //https://github.com/jprichardson/string.js/blob/master/dist/string.js
         var ctx = this;
+        s = s.toString();
         // Licensed under MIT.
         // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
         s = s.replace(/&#(\d+);?/g, function (_, code) {
