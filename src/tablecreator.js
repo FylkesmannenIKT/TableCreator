@@ -1875,6 +1875,7 @@ function TableCreator(data, el) {
 
     this.decodeHtmlEntities = function(s) { //https://github.com/jprichardson/string.js/blob/master/dist/string.js
         var ctx = this;
+        s = s || "";
         s = s.toString();
         // Licensed under MIT.
         // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
