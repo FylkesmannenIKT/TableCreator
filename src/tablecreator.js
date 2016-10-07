@@ -1022,11 +1022,12 @@ function TableCreator(data, el) {
             }
 
             html += '<div class="form-group row">';
-            html += '<label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '</label>';
 
-            if (type === 'number') {
-                html += '<div class="col-md-push-3 col-md-5">';
+            if (type === 'number' || type === 'percent') {
+                html += '<label for="tcEdit_' + id + '" class="control-label col-md-7">' + title + '</label>';
+                html += '<div class="col-md-5">';
             } else {
+                html += '<label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '</label>';
                 html += '<div class="col-md-8">';
             }
 
