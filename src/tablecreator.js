@@ -644,13 +644,13 @@ function TableCreator(data, el) {
      */
     this.formatData = function formatData(value, type) {
         var val = value;
+
+        var precision = 2;
+        if (typeof this.settings.precision === 'number')
+            precision = this.settings.precision;
+
         switch(type) {
             case 'number':
-
-                var precision = 2;
-                if (typeof this.settings.precision === 'number')
-                    precision = this.settings.precision;
-
                 val = parseFloat(val).toFixed(precision);
                 val = isNaN(val) ? "" : val;
 
@@ -661,7 +661,8 @@ function TableCreator(data, el) {
                 val = (val.charAt(0) == '-') ? nMinus : val;
                 break;
             case 'percent':
-                val = val.toString().isNumeric() ? val.toString() + ' %' : "0 %";    // default to zero if not a number
+                val = parseFloat(val).toFixed(precision);
+                val = isNaN(val) ? "0 %" : val + " %";
                 var pMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
                 val = (val.charAt(0) == '-') ? pMinus : val;
                 break;
