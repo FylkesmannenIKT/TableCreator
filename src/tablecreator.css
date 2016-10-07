@@ -200,7 +200,7 @@ td.number {
     content: "\f0e6";
 }
 
-.tc_table .tc_warning {
+.modal .tc_warning {
 	border: 3px solid #FF4500;
 }
 
