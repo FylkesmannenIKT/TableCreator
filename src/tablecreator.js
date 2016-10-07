@@ -1577,7 +1577,7 @@ function TableCreator(data, el) {
 
     this.blankRowEditor = function() {
         var cols = this.data.thead.cols;
-        var settings = this.data.table;
+        var settings = this.data.table || {};
         var html = '';
         var template = null;
         if (settings.hasOwnProperty("template"))
@@ -1606,10 +1606,12 @@ function TableCreator(data, el) {
                 html += '<div class="col-md-8">';
             }
 
-            if (settings.pool.hasOwnProperty(id)) {
-                if (settings.pool[id].constructor === Array) {
-                    type = 'dropdown';
-                    pool = settings.pool[id];
+            if (settings.hasOwnProperty("pool")) {
+                if (settings.pool.hasOwnProperty(id)) {
+                    if (settings.pool[id].constructor === Array) {
+                        type = 'dropdown';
+                        pool = settings.pool[id];
+                    }
                 }
             }
 
