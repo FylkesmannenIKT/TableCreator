@@ -1043,7 +1043,7 @@ function TableCreator(data, el) {
                 default:
                 case 'undefined':
                 case 'string':
-                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '" value="' + (row[id] || "") + '"/>';
                     break;
                 case 'number':
                     var frac = Math.pow(10,settings.settings.decimals);
