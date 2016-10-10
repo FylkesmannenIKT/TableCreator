@@ -336,9 +336,11 @@ function TableCreator(data, el) {
 
         el.innerHTML = html;
 
+        var tableDiv = el.getElementsByClassName("tc_table")[0];
+        var fullWidth = tableDiv.parentNode.offsetWidth;
+        var partWidth = tableDiv.offsetWidth;
         var commentDiv = el.getElementsByClassName("tcComment")[0];
-        var tableWidth = el.getElementsByClassName("tc_table")[0].offsetWidth;
-        commentDiv.setAttribute("style","width:" + tableWidth + "px");
+        commentDiv.setAttribute("style","width:" + (partWidth / fullWidth * 100) + "%");
 
         if (data.hasOwnProperty("table")) 
             if (data.table.hasOwnProperty("comment"))
