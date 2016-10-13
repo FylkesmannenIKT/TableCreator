@@ -385,6 +385,7 @@ function TableCreator(data, el) {
             var cClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
             cClass += headerRow.type === "number" ? ' number' : '';
             cClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
+            cClass += headerRow.type === "multichoice" ? ' tcLeftAlign' : '';
             cClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
             html += '<th class="' + cClass + '">' + headerTitle + '</th>';
         }
@@ -597,6 +598,12 @@ function TableCreator(data, el) {
                 break;
             case 'index':
                 html += '<td>' + (refIdx+1) + '</td>';
+                break;
+            case 'multichoice':
+                if (cValue.constructor === Array) {
+                    cValue = cValue.join(', ');
+                }
+                html += '<td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '</td>';
                 break;
             case 'actionArray':
                 html += '<td class="tcActionRow hide ' + cClass + '">';
@@ -1036,11 +1043,15 @@ function TableCreator(data, el) {
             if (settings.hasOwnProperty("pool")) {
                 if(settings.pool.hasOwnProperty(id)) {
                     if (settings.pool[id].constructor === Array) {
-                        type = 'dropdown';
+                        if (type !== 'multichoice') {
+                            type = 'dropdown';
+                        }
                         pool = settings.pool[id];
                     }
                 }
             }
+
+            row[id] = row[id] || ""; // make empty string value if it doesn't exist.
 
             switch (type) {
                 default:
@@ -1062,6 +1073,25 @@ function TableCreator(data, el) {
                         html += '<option' + selected + '>' + pool[j] + '</option>';
                     }
                     html += '</select>';
+                    break;
+                case 'multichoice':
+                    var isActive, active, checked;
+                    for (var k = 0; k < pool.length; ++k) {
+                        isActive = false;
+                        if (row[id].constructor === Array) {
+                            for (var l = 0; l < row[id].length && !isActive; ++l) {
+                                if(this.decodeHtmlEntities(row[id][l]) === pool[k])
+                                    isActive = true;
+                            }
+                        }
+                        else if (typeof row[id] === 'string' && row[id] === this.decodeHtmlEntities(pool[k])) {
+                            isActive = true;
+                        }
+                        active = (isActive ? 'active' : '');
+                        checked = (isActive ? ' checked' : '');
+                        html += '<div class="checkbox"><label class="' + active + '">'+
+                                    '<input type="checkbox"' + checked + ' name="tcEdit_' + id + '_' + k + '">' + pool[k] + '</label></div>';
+                    }
                     break;
             }
 
@@ -1098,14 +1128,19 @@ function TableCreator(data, el) {
             return; // errors will be displayed in open modal
         }
 
-        var element, key, value, type;
+        var element, key, value, type, hasCheckBox = false;
         var inputs = bodyElement.find("input[name^='tcEdit_']");
         inputs.each(function(index, inputElement) {
             element = $(inputElement);
             key = element.attr('name').slice("tcEdit_".length);
             if (element.val().length === 0) return;
-            value = element.val();
             type = element.attr('type');
+            value = element.val();
+            if (type === 'checkbox') {
+                value = element.prop('checked');
+                hasCheckBox = true;
+            }
+
             dictionary.push({ "key": key, "value": value, "type": type });
         });
         
@@ -1117,10 +1152,19 @@ function TableCreator(data, el) {
             dictionary.push({ "key": key, "value": value });
         });
 
+        var pool = null;
+        if(hasCheckBox) {
+
+            pool = !!this.data ? 
+                    !!this.data.table ? 
+                     !!this.data.table.pool ?  this.data.table.pool : null : null : null;
+        }
+
         var row = this.data.tbody[rowIdx];
         var oldValues = {};
         var newValues = {};
         var valid = true;
+        var checkboxId;
         for (var x = 0; x < dictionary.length; ++x) {
             key = dictionary[x].key;
             value = dictionary[x].value;
@@ -1138,6 +1182,28 @@ function TableCreator(data, el) {
                     continue;
                 }
                 value = value.toString();
+            }
+
+            if (type == 'checkbox') {
+                if (value === false) continue;
+                if (value === true) {
+                    checkboxId = key.substring(key.lastIndexOf('_')+1, key.length);
+                    key = key.substring(0, key.lastIndexOf('_'));
+                    value = this.data.table.pool[key][checkboxId];
+
+                    if (!row.hasOwnProperty(key)) {
+                        oldValues[key] = null;
+                        newValues[key] = [value];
+                    } 
+                    else {
+                        oldValues[key] = row[key];
+                        if (!newValues.hasOwnProperty(key) || newValues[key].constructor !== Array) 
+                            newValues[key] = [];
+
+                        newValues[key].push(value);
+                        continue;
+                    }
+                }
             }
 
             // Create objects with new and old values (do not track equal values)
@@ -1176,14 +1242,29 @@ function TableCreator(data, el) {
         var newUndo = { undo: row.undo };
         for (var y in oldValues) {
             if(oldValues.hasOwnProperty(y)) {
-                newUndo[y] = this.decodeHtmlEntities(oldValues[y]);
+                if (oldValues[y].constructor === Array) {
+                    newUndo[y] = newUndo[y] || [];
+                    for (var n = 0; n < oldValues[y].lenght; ++n) {
+                        newUndo[y][n] = this.decodeHtmlEntities(oldValues[y][n]);
+                    }
+                }
+                else {
+                    newUndo[y] = this.decodeHtmlEntities(oldValues[y]);
+                }
             }
         }
 
         var newRow = {};
         for (var z in newValues) {
             if (newValues.hasOwnProperty(z)) {
-                newRow[z] = this.decodeHtmlEntities(newValues[z]);
+                if (newValues[z].constructor === Array) {
+                    newRow[z] = newRow[z] || [];
+                    for (var o = 0; o < newValues[z].length; ++o) {
+                        newRow[z][o] = this.decodeHtmlEntities(newValues[z][o]);
+                    }
+                } else {
+                    newRow[z] = this.decodeHtmlEntities(newValues[z]);
+                }
             }
         }
 
@@ -1471,7 +1552,8 @@ function TableCreator(data, el) {
 
         var validity = true;
         var newRow = this.data.table.template.addTpl || {};
-        var element, key, value;
+        var pool = this.data.table.pool || {};
+        var element, key, value, keyIdx;
         var formElements = container.find("[name^='tcEdit_']");
         formElements.each(function() {
             element = $(this);
@@ -1486,7 +1568,20 @@ function TableCreator(data, el) {
                 element.removeClass("tc_warning");
                 key = element.attr('name').slice("tcEdit_".length);
                 value = element.val();
-                newRow[key] = value;
+
+                if (element.is("input:checkbox")) {
+                    if (element.is(":checked")) {
+                        keyIdx = key.substring(key.lastIndexOf('_')+1, key.length);
+                        key =key.substring(0, key.lastIndexOf('_'));
+                        value = pool[key][keyIdx] || "";
+                        if (!newRow.hasOwnProperty(key) || newRow[key].constructor !== Array) {
+                            newRow[key] = [];
+                        }
+                        newRow[key].push(value);
+                    }
+                } else {
+                    newRow[key] = value;
+                }
             }
 
             // check validity on select elements
@@ -1613,7 +1708,9 @@ function TableCreator(data, el) {
             if (settings.hasOwnProperty("pool")) {
                 if (settings.pool.hasOwnProperty(id)) {
                     if (settings.pool[id].constructor === Array) {
-                        type = 'dropdown';
+                        if (type !== 'multichoice') {
+                            type = 'dropdown';
+                        }
                         pool = settings.pool[id];
                     }
                 }
@@ -1646,6 +1743,12 @@ function TableCreator(data, el) {
                         html += '<option' + selected + '>' + pool[j] + '</option>';
                     }
                     html += '</select>';
+                    break;
+                case 'multichoice':
+                    for (var k = 0; k < pool.length; ++k) {
+                        html += '<div class="checkbox"><label><input type="checkbox" name="tcEdit_' + id + '_' + k + '">' +
+                            pool[k] + '</label></div>';
+                    }
                     break;
             }
 
