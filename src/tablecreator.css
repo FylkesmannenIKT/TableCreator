@@ -209,28 +209,28 @@ td.number {
 }
 
 @media print {
-  .tc_table .tc-hidden-print {
-    display: none;
-  }
+	.tc_table .tc-hidden-print {
+		display: none;
+	}
 
-  .tc_table td,
-  .tc_table th {
-  	border-right: 1px solid;
-  }
+	.tc_table td,
+	.tc_table th {
+		border-right: 1px solid;
+	}
 
-  .tc_table thead {
-  	border-bottom: 1px solid;
-  }
+	.tc_table thead {
+		border-bottom: 1px solid;
+	}
 
-  .tc_table .container {
-    width: 100%;
-    max-width: 100%;
-    min-width: 100%;
-  }
+	.tc_table .container {
+		width: 100%;
+		max-width: 100%;
+		min-width: 100%;
+	}
 
-  .tc_table .jumbotron {
-    display: none;
-  }
+	.tc_table .jumbotron {
+		display: none;
+	}
 }
 
 .tcComment {
