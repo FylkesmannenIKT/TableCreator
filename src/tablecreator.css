@@ -231,6 +231,10 @@ td.number {
 	.tc_table .jumbotron {
 		display: none;
 	}
+
+	.tcComment {
+		width: 100% !important;
+	}
 }
 
 .tcComment {
