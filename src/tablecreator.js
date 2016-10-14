@@ -1244,7 +1244,7 @@ function TableCreator(data, el) {
             if(oldValues.hasOwnProperty(y)) {
                 if (oldValues[y].constructor === Array) {
                     newUndo[y] = newUndo[y] || [];
-                    for (var n = 0; n < oldValues[y].lenght; ++n) {
+                    for (var n = 0; n < oldValues[y].length; ++n) {
                         newUndo[y][n] = this.decodeHtmlEntities(oldValues[y][n]);
                     }
                 }
