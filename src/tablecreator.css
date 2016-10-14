@@ -255,3 +255,15 @@ td.number {
 	width: 100%;
 	overflow: hidden;
 }
+
+#CommentModal .charactersLeft { text-align: right; }
+
+#CommentModal .charactersLeft span {
+	color: #ccc;
+	padding: 0.3em;
+	margin: 0.3em;
+}
+
+#CommentModal .minus {
+	background-color: #FCC;
+}

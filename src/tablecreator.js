@@ -1903,15 +1903,20 @@ function TableCreator(data, el) {
         var ctx = this;
         var container = $('#CommentModal');
         var body = container.find(".modal-body");
-        // var commentArea = $('<textarea onkeyup="removeVertical(this);return false;"></textarea>');
-        var commentArea = $('<textarea onkeyup="$(this).val($(this).val().replace(/\\n/g, \'\')); this.style.height=(this.scrollHeight+2)+\'px\'; return false;"></textarea>');
+
+        var commentArea = $('<textarea onkeyup="TableCreator.updateCommentEditor(this); return false;"></textarea>');
+
         var comment = "";
         if(this.data.hasOwnProperty("table"))
             if (this.data.table.hasOwnProperty("comment"))
                 comment = this.data.table.comment;
 
         commentArea.val(this.decodeHtmlEntities(comment));
+
         body.html(commentArea);
+        body.append($('<div class="charactersLeft"><span>check</span></div>'));
+
+        this.constructor.updateCommentEditor(commentArea.get(0));
 
         var commentButton = container.find("#CommentSave");
         commentButton.off("click").on("click", commentClickEvent);
@@ -1929,8 +1934,10 @@ function TableCreator(data, el) {
         var ctx = this;
         var textarea = bodyElement.find("textarea");
         var comment = textarea.val();
-        console.log("escapedComment");
-        console.log({comment: comment});
+
+        if (comment.length > 900) {
+            return;
+        }
 
         var ajaxData = {
             SchemaId: this.settings.schemaId,
@@ -2272,3 +2279,25 @@ function TableCreator(data, el) {
 
     return this;
 }
+
+TableCreator.updateCommentEditor = function(textarea) {
+    // remove newlines
+    textarea.value = textarea.value.replace(/\n/g, '');
+
+    // set textarea height
+    var highest = (textarea.scrollHeight > textarea.offsetHeight) ? textarea.scrollHeight : textarea.offsetHeight;
+    textarea.style.height = highest +'px'; 
+
+    // constrain length of comment
+    var length = textarea.value.length;
+    var pasteSpan = $("#CommentModal .charactersLeft span");
+    var charLeft = 900 - length;
+    pasteSpan.text(charLeft);
+    if (charLeft >= 0) {
+        textarea.classList.remove("minus");
+        $("#CommentModal #CommentSave").prop("disabled", false);
+    } else {
+        textarea.classList.add("minus");
+        $("#CommentModal #CommentSave").prop("disabled", true);
+    }
+};
