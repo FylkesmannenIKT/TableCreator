@@ -1185,25 +1185,19 @@ function TableCreator(data, el) {
             }
 
             if (type == 'checkbox') {
-                if (value === false) continue;
-                if (value === true) {
-                    checkboxId = key.substring(key.lastIndexOf('_')+1, key.length);
-                    key = key.substring(0, key.lastIndexOf('_'));
-                    value = this.data.table.pool[key][checkboxId];
+                checkboxId = key.substring(key.lastIndexOf('_')+1, key.length);
+                key = key.substring(0, key.lastIndexOf('_'));
 
-                    if (!row.hasOwnProperty(key)) {
-                        oldValues[key] = null;
-                        newValues[key] = [value];
-                    } 
-                    else {
-                        oldValues[key] = row[key];
-                        if (!newValues.hasOwnProperty(key) || newValues[key].constructor !== Array) 
-                            newValues[key] = [];
-
-                        newValues[key].push(value);
-                        continue;
-                    }
+                if (!newValues.hasOwnProperty(key) || newValues[key].constructor !== Array) {
+                    oldValues[key] = row[key] || null;
+                    newValues[key] = [];
                 }
+
+                if (value === true) {
+                    value = this.data.table.pool[key][checkboxId];
+                    newValues[key].push(value);
+                }
+                continue;
             }
 
             // Create objects with new and old values (do not track equal values)
