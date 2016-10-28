@@ -160,6 +160,10 @@ td.number {
 	padding-right: 1em;
 }
 
+.tc_table .hide {
+    display: none!important;
+}
+
 .tcActionMenu {
 	margin-top: 0.25em;
 }
