@@ -312,7 +312,7 @@ function TableCreator(data, el) {
                 tableClass += isVertical ? " vertical" : " horizontal";
             }
 
-            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : "";
+            tableClass += (data.table.hasOwnProperty("class")) ? data.table.class : "";
         }
 
         var html = "";
