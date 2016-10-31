@@ -317,7 +317,7 @@ function TableCreator(data, el) {
 
         var html = "";
         if (title !== "") {
-            html += '<span>' + title + '</span>';
+            html += '<p class="tc_heading">' + title + '</p>';
         }
 
         html += '<table class="tc_table ' + tableClass + '">';
