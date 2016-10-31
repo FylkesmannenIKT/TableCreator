@@ -1174,7 +1174,7 @@ function TableCreator(data, el) {
             if (type == 'number') {
                 if(typeof value === "string") {
                     value = value.replace(/\s/g, ''); // remove spaces (1 000 000) for parseFloat in IE where spaces are accepted in number input
-                    value = value.replace('/,/g', '.'); // replace all commas with dots, such that they are recognised as decimal separators
+                    value = value.replace(/,/g, '.'); // replace all commas with dots, such that they are recognised as decimal separators
                 }
                 value = parseFloat(value);
                 if (row.hasOwnProperty(key)) row[key] = parseFloat(row[key]);
