@@ -116,6 +116,10 @@ td.number {
 	color: red;
 }
 
+.tc_table .good_minus .minus {
+	color: initial;
+}
+
 .tc_table .tcActionRow {}
 
 .tc_table a.tcAction:hover,
