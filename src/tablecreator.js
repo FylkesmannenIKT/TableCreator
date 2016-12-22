@@ -594,6 +594,7 @@ function TableCreator(data, el) {
             default:
             case 'string':
             case undefined:
+                if (cValue === null || cValue === undefined) cValue = "";
                 html += '<td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '</td>';
                 break;
             case 'index':
