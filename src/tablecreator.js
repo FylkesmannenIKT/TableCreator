@@ -672,7 +672,7 @@ function TableCreator(data, el) {
                 break;
             case 'percent':
                 val = parseFloat(val).toFixed(precision);
-                val = isNaN(val) ? "0 %" : val + " %";
+                val = isNaN(val) ? "" : val + " %";
                 var pMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
                 val = (val.charAt(0) == '-') ? pMinus : val;
                 break;
