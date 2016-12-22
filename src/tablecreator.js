@@ -1061,10 +1061,10 @@ function TableCreator(data, el) {
                     break;
                 case 'number':
                     var frac = Math.pow(10,settings.settings.decimals);
-                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
                     break;
                 case 'percent':
-                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
@@ -1725,12 +1725,12 @@ function TableCreator(data, el) {
                     var frac = Math.pow(10, settings.settings.decimals);
                     html += '<input type="number" class="form-control" ' + 
                         'step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" ' + 
-                        (value === null ? 'value="0"' : 'value="' + value + '"') + '/>';
+                        (value === null ? 'value="0"' : 'value="' + value + '"') + ' lang="nb"/>';
                     break;
                 case 'percent':
                     html += '<input type="number" class="form-control" ' + 
                         'step="0.1" name="tcEdit_' + id + '"' + 
-                        (value === null ? 'value="0"' : 'value="' + value + '"') + '/>';
+                        (value === null ? 'value="0"' : 'value="' + value + '"') + ' lang="nb"/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
