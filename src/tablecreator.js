@@ -1884,7 +1884,9 @@ function TableCreator(data, el) {
         var actionMenu = el.getElementsByClassName("tcActionMenu")[0];
         var editButton = $(actionMenu).find(".commentEdit");
         if (editButton.length === 0) {
-            editButton = $('<a class="tcActionRow commentEdit" tabindex="0">Rediger kommentar</a>');
+            var commentLength = !!this.data ? !!this.data.table ? !!this.data.table.comment ? this.data.table.comment.length : 0 : 0 : 0;
+            var actionCommand = commentLength > 0 ? "Endre" : "Legg til";
+            editButton = $('<a class="tcActionRow commentEdit" tabindex="0">' + actionCommand + ' kommentar</a>');
             $(actionMenu).append(editButton);
         }
 
