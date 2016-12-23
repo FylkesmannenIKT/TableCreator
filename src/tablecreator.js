@@ -1441,7 +1441,7 @@ function TableCreator(data, el) {
         }
 
         for (var change in row.undo) {
-            if (row.undo.hasOwnProperty(change) && change !== "undo") {
+            if (row.undo.hasOwnProperty(change) && change !== "undo" && row.undo[change] !== null) {
                 requestObj[change] = row.undo[change];
             }
         }
