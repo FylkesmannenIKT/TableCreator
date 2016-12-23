@@ -1248,10 +1248,8 @@ function TableCreator(data, el) {
         var newUndo = { undo: row.undo };
         for (var y in oldValues) {
             if(oldValues.hasOwnProperty(y)) {
-                if (!oldValues[y]) {
-                    newUndo[y] = null;
-                }
-                else if (oldValues[y].constructor === Array) {
+                // multichoice
+                if (!!oldValues[y] && oldValues[y].constructor === Array) {
                     newUndo[y] = newUndo[y] || [];
                     for (var n = 0; n < oldValues[y].length; ++n) {
                         newUndo[y][n] = this.decodeHtmlEntities(oldValues[y][n]);
