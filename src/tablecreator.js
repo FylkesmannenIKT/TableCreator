@@ -1134,12 +1134,19 @@ function TableCreator(data, el) {
         inputs.each(function(index, inputElement) {
             element = $(inputElement);
             key = element.attr('name').slice("tcEdit_".length);
-            if (element.val().length === 0) return;
             type = element.attr('type');
             value = element.val();
             if (type === 'checkbox') {
                 value = element.prop('checked');
                 hasCheckBox = true;
+            }
+            else if (type === 'number') {
+                value = element.val().lenght === 0 ? "0" :
+                        value === null ? "0" :
+                        value === "" ? "0" : value;
+            }
+            else if (element.val().length === 0) {
+                value = "";
             }
 
             dictionary.push({ "key": key, "value": value, "type": type });
@@ -1581,6 +1588,10 @@ function TableCreator(data, el) {
                         }
                         newRow[key].push(value);
                     }
+                } else if (element.is("input[type='number']")) {
+                    newRow[key] = value === "" ? "0" : 
+                                  value === null ? "0" : 
+                                  value.length === 0 ? "0" : value;
                 } else {
                     newRow[key] = value;
                 }
