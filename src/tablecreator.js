@@ -1,4 +1,4 @@
-/*global $, console, alert*/
+/*global $, console*/
 /*exported TableCreator*/
 
 /**
@@ -8,13 +8,13 @@
  * @license MIT
  */
 
-"use strict";
-
 String.prototype.isNumeric = function() {
+    "use strict";
     return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
 Array.prototype.clean = function() {
+    "use strict";
     for(var i = 0; i < this.length; i++) {
         if(this[i] === "") {
             this.splice(i, 1);
@@ -29,6 +29,7 @@ Array.prototype.clean = function() {
  * @class 
  */
 function TableCreator(data, el) {
+    "use strict";
 
     /*
      * Always return a new instance of the TableCreator.
@@ -111,7 +112,7 @@ function TableCreator(data, el) {
      * to activate elements we have navigated to (i.e. by tabing).
      */
     this.el.onkeyup = function(evt) {
-        if (evt.which == 13 || evt.keyCode == 13) {
+        if (evt.which === 13 || evt.keyCode === 13) {
             evt.path[0].click();
         }
         console.log(evt);
@@ -307,7 +308,7 @@ function TableCreator(data, el) {
                 }
 
                 isVertical = data.table.settings.hasOwnProperty("dataOrientation") && 
-                    data.table.settings.dataOrientation == "vertical";
+                    data.table.settings.dataOrientation === "vertical";
 
                 tableClass += isVertical ? " vertical" : " horizontal";
             }
@@ -413,8 +414,8 @@ function TableCreator(data, el) {
                     var method = column[x].method;
                     var type = column[x].hasOwnProperty("type") ? column[x].type : '';
                     var answer = this.parseMethod(method, dataLine);
-                    answer = (type == 'number') ? this.formatData(answer, 'number') : 
-                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
+                    answer = (type === 'number') ? this.formatData(answer, 'number') : 
+                             (type === 'percent') ? this.formatData(answer, 'percent') : answer;
                     html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
 
                 }
@@ -523,8 +524,8 @@ function TableCreator(data, el) {
                 if (hasMethod) {
                     method = item.method;
                     answer = this.parseMethod(method, itemData);
-                    answer = (type == 'number') ? this.formatData(answer, 'number') :
-                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
+                    answer = (type === 'number') ? this.formatData(answer, 'number') :
+                             (type === 'percent') ? this.formatData(answer, 'percent') : answer;
                     html += '<td class="' + type + ' ' + hClass + '">' + answer + '</td>';
                 }
                 else {
@@ -668,13 +669,13 @@ function TableCreator(data, el) {
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 val = parts.join('.');
                 var nMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
-                val = (val.charAt(0) == '-') ? nMinus : val;
+                val = (val.charAt(0) === '-') ? nMinus : val;
                 break;
             case 'percent':
                 val = parseFloat(val).toFixed(precision);
                 val = isNaN(val) ? "" : val + " %";
                 var pMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
-                val = (val.charAt(0) == '-') ? pMinus : val;
+                val = (val.charAt(0) === '-') ? pMinus : val;
                 break;
             default:
                 break;
@@ -928,7 +929,7 @@ function TableCreator(data, el) {
         $("body").append(modal);
 
         modal.on("keyup", function(evt) {
-            if(evt.which == 13 || evt.keyCode == 13) { // if Enter is released
+            if(evt.which === 13 || evt.keyCode === 13) { // if Enter is released
                 actionButton.click();
             }
             return true;
@@ -1179,7 +1180,7 @@ function TableCreator(data, el) {
             type = dictionary[x].hasOwnProperty("type") ? dictionary[x].type : null;
 
             // Test for NaN values
-            if (type == 'number') {
+            if (type === 'number') {
                 if(typeof value === "string") {
                     value = value.replace(/\s/g, ''); // remove spaces (1 000 000) for parseFloat in IE where spaces are accepted in number input
                     value = value.replace(/,/g, '.'); // replace all commas with dots, such that they are recognised as decimal separators
@@ -1196,7 +1197,7 @@ function TableCreator(data, el) {
                 value = value.toString();
             }
 
-            if (type == 'checkbox') {
+            if (type === 'checkbox') {
                 checkboxId = key.substring(key.lastIndexOf('_')+1, key.length);
                 key = key.substring(0, key.lastIndexOf('_'));
 
@@ -2292,9 +2293,10 @@ function TableCreator(data, el) {
 
 
     return this;
-}
+} // End of TableCreator class
 
 TableCreator.updateCommentEditor = function(textarea) {
+    "use strict";
     // remove newlines
     textarea.value = textarea.value.replace(/\n/g, '');
 
