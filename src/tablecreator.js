@@ -2291,6 +2291,76 @@ function TableCreator(data, el) {
         "diams;" : 9830
     };
 
+    /** 
+     * Take an array and compare it with the content of the table.
+     * It will be used externally to check against table prefill to see
+     * if there are any changes.
+     *
+     * @example
+     * if (table.isEqualToTableRowArray(inputArray)) { ... }
+     *
+     * @param {Array} inArray - an Array with objects similar to this.data.tbody
+     * @returns {Boolean} Whether the table content and array content is considered equal
+     * @memberOf TableCreator
+     */
+    this.isEqualToTableRowArray = function(inArray) {
+        // not equal if input array is null/undefined or not an array
+        if(!inArray || inArray.constructor !== Array) {
+            return false;
+        }
+
+        // not equal if length is different
+        if (inArray.length !== this.data.tbody.length) {
+            return false;
+        }
+
+        // compare each element
+        var obj, tableObj;
+        for(var itr = 0; itr < inArray.length; ++itr) {
+            obj = inArray[itr];
+            tableObj = this.data.tbody[itr];
+
+            // if element in array is undefined, null or false in any way, return false
+            if (!obj || typeof obj !== 'object' || !tableObj || typeof tableObj !== 'object') {
+                return false;
+            }
+
+            // is in obj
+            for (var prop in obj) {
+                if(obj.hasOwnProperty(prop)) {
+                    // but not in tableObject
+                    if (!tableObj.hasOwnProperty(prop)) {
+                        return false;
+                    }
+                    // but is not equal to what is in tableObj
+                    else if (obj[prop] !== tableObj[prop]) {
+                        return false;
+                    }
+                }
+            }
+
+            // is in tableObj (in cases where it is here, but not in obj)
+            for (var tProp in tableObj) {
+                if (tableObj.hasOwnProperty(tProp)) {
+                    // but not in ojb and are not undo or isSaving
+                    if (!obj.hasOwnProperty(tProp)) {
+
+                        var change = tProp === 'undo' ? false :
+                                tProp === 'isSaving' ? false :
+                                !tableObj[tProp] ? false :
+                                tableObj[tProp] === "0" ? false :
+                                true;
+
+                        if (change) {
+                            return false;
+                        }                        
+                    }
+                }
+            }
+        }
+        // the array can be considered empty
+        return true;
+    };
 
     return this;
 } // End of TableCreator class
