@@ -1309,7 +1309,7 @@ function TableCreator(data, el) {
                     errorDiv.html('<p>Ikke lagret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
                     break;
                 default:
-                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + ').</p>');
+                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + '). Å laste siden på nytt vil kunne hjelpe (trykk F5 på tastaturet).</p>');
                     break;
             }
 
