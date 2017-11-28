@@ -1989,6 +1989,28 @@ function TableCreator(data, el) {
 
     };
 
+    this.updateCommentEditor = function(textarea) {
+        // remove newlines
+        textarea.value = textarea.value.replace(/\n/g, '');
+
+        // set textarea height
+        var highest = (textarea.scrollHeight > textarea.offsetHeight) ? textarea.scrollHeight : textarea.offsetHeight;
+        textarea.style.height = highest +'px'; 
+
+        // constrain length of comment
+        var length = textarea.value.length;
+        var pasteSpan = $("#CommentModal .charactersLeft span");
+        var charLeft = 900 - length;
+        pasteSpan.text(charLeft);
+        if (charLeft >= 0) {
+            textarea.classList.remove("minus");
+            $("#CommentModal #CommentSave").prop("disabled", false);
+        } else {
+            textarea.classList.add("minus");
+            $("#CommentModal #CommentSave").prop("disabled", true);
+        }
+    };
+
     this.decodeHtmlEntities = function(s) { //https://github.com/jprichardson/string.js/blob/master/dist/string.js
         var ctx = this;
         s = s === 0 ? "0" :     // is number zero, then string with zero
@@ -2099,26 +2121,3 @@ function TableCreator(data, el) {
 
     return this;
 } // End of TableCreator class
-
-TableCreator.updateCommentEditor = function(textarea) {
-    "use strict";
-    // remove newlines
-    textarea.value = textarea.value.replace(/\n/g, '');
-
-    // set textarea height
-    var highest = (textarea.scrollHeight > textarea.offsetHeight) ? textarea.scrollHeight : textarea.offsetHeight;
-    textarea.style.height = highest +'px'; 
-
-    // constrain length of comment
-    var length = textarea.value.length;
-    var pasteSpan = $("#CommentModal .charactersLeft span");
-    var charLeft = 900 - length;
-    pasteSpan.text(charLeft);
-    if (charLeft >= 0) {
-        textarea.classList.remove("minus");
-        $("#CommentModal #CommentSave").prop("disabled", false);
-    } else {
-        textarea.classList.add("minus");
-        $("#CommentModal #CommentSave").prop("disabled", true);
-    }
-};
