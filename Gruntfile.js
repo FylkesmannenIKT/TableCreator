@@ -96,4 +96,10 @@ module.exports = function(grunt) {
   grunt.registerTask('export_to_Nokkeltall', ['copy:export']);
 
   grunt.registerTask('polyfill', ['optimizePolyfiller']);
+
+
+  // example 1: npx grunt default
+  // example 2: npx grunt export_to_Nokkeltall
+  // example 3: npx grunt default export_to_Nokkeltall
+  // example 4: npx grunt uglify
 };
