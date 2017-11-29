@@ -921,6 +921,64 @@ function TableCreator(data, el) {
     };
 
     /**
+     * Insert data into row
+     * @param {Object} rowData Object with data
+     * @param {integer} [position] Which row to insert to
+     * @param {boolean} replace Should an existing row be replaced?
+     * @return void
+     */
+    this.insertRow = function(rowData, position, replace) {
+        var columns = this.getTableColumnIds();
+        var newRow = this.constructRowFromData(rowData, columns);
+
+        if(typeof position === 'number') {
+            var deleteCount = (typeof replace === 'boolean' && replace) ? 1 : 0;
+            this.data.tbody.splice(position, deleteCount, newRow);
+        } else {
+            this.data.tbody.push(newRow);
+        }
+    };
+
+    this.constructRowFromData = function(data, columns) {
+        var newRow = {};        
+        columns.forEach(function(column) {
+            data[column] && (newRow[column] = data[column]);
+        });
+        return newRow;
+    };
+
+    this.getTableColumnIds = function() {
+        var columnIds = [];
+        this.data.thead.cols.forEach(function(column) {
+            column.id && columnIds.push(column.id);
+        });
+        return columnIds;
+    };
+
+    /**
+     *  Get array of objects containing column id and attribute.
+     * @example
+     * getTableColumnAttribute("databind", true)
+     * // returns [{"id": "firstColumn", "databind": "MyBindValue"}, {"id":"secondColumn","databind":"MyBindValue2"}];
+     *
+     * @param {string} attribute Which one attribute to look for.
+     * @param {boolean} includeEmpty Include columns without the given attribute.
+     * @return {Object[]} Array of Objects containing members of "id" and *attribute*
+     */
+    this.getTableColumnAttribute = function(attribute, includeEmpty) {
+        var bindKeys = [];
+        this.data.thead.cols.forEach(function (column) {
+            if (column[attribute]) {
+                var obj = { id: column.id };
+                obj[attribute] = column[attribute];
+                bindKeys.push(obj);
+            }
+            !column[attribute] && column.id && includeEmpty && bindKeys.push({ "id": column.id });
+        });
+        return bindKeys;
+    };
+
+    /**
      * Create a modal
      * The ID of the submit button will be the modalId postfixed with _Save
      * @param {string} modalId The DOM ID to reference the returned modal
