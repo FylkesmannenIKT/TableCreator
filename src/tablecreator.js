@@ -2011,6 +2011,19 @@ function TableCreator(data, el) {
         }
     };
 
+
+    /********************************************************************************
+     *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY ***
+     *******************************************************************************/
+
     this.decodeHtmlEntities = function(s) { //https://github.com/jprichardson/string.js/blob/master/dist/string.js
         var ctx = this;
         s = s === 0 ? "0" :     // is number zero, then string with zero
