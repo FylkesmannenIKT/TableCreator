@@ -192,6 +192,26 @@ function TableCreator(data, el) {
 
 
     /**
+     * Gets the table part of the definition.
+     * @memberOf TableCreator
+     *
+     * @return {object} this.data.table with id, settings etc.
+     */
+    this.getTableDefinitionInfo = function() {
+        return this.data && this.data.table;
+    };
+
+    /**
+     * Gets the thead.cols part of the definition containing the column definitions.
+     * @memberOf TableCreator
+     *
+     * @return {object[]} this.data.thead.cols.
+     */
+    this.getTableDefinitionColumns = function() {
+        return this.data && this.data.thead && this.data.thead.cols;
+    };
+
+    /**
      * Init - Loads settings from the json structure
      * @memberOf TableCreator
      *
