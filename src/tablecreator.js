@@ -2212,3 +2212,5 @@ function TableCreator(data, el) {
 
     return this;
 } // End of TableCreator class
+
+global.TableCreator = TableCreator;
