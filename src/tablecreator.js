@@ -838,7 +838,7 @@ function TableCreator(data, el) {
                     args.push(data[item]);
                 }
                 else if(item.charAt(0) === '-' && data.hasOwnProperty(item.slice(1))) {
-                    args.push(-data[item.slice(1)]);
+                    args.push(-parseFloat(data[item.slice(1)]));
                 }
                 else {  // can we find attribute in column definitions?
                     var sliced = item.slice(1);
