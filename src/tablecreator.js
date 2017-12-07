@@ -2223,6 +2223,8 @@ TableCreator.updateCommentEditor = function(textarea) {
     }
 };
 
-
-var global = global || window || {};
-global.TableCreator = TableCreator;
+if(typeof window !== 'undefined') {
+    window.TableCreator = TableCreator;
+} else if (typeof global !== 'undefined') {
+    global.TableCreator = TableCreator;    
+}
