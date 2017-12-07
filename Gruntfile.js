@@ -94,10 +94,12 @@ module.exports = function(grunt) {
   // Default task(s).
   grunt.registerTask('default', ['uglify','cssmin','jsdoc']);
   grunt.registerTask('export_to_Nokkeltall', ['copy:export']);
+  grunt.registerTask('full', ['default', 'export_to_Nokkeltall'])
 
   grunt.registerTask('polyfill', ['optimizePolyfiller']);
 
 
+  // view tasks: npx grunt --help
   // example 1: npx grunt default
   // example 2: npx grunt export_to_Nokkeltall
   // example 3: npx grunt default export_to_Nokkeltall
