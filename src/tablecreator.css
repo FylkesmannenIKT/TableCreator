@@ -55,6 +55,11 @@
 	border-right: 1px solid black;
 }
 
+.tc_table.vertical tr:nth-last-child(2) th,
+.tc_table.vertical tr:nth-last-child(2) td {
+	bottom-border: 1px solid black;
+}
+
 .tc_table td.tcRightAlign {
 	text-align: right;
 }
@@ -116,6 +121,10 @@ td.number {
 	color: red;
 }
 
+.tc_table .good_minus .minus {
+	color: initial;
+}
+
 .tc_table .tcActionRow {}
 
 .tc_table a.tcAction:hover,
@@ -158,6 +167,10 @@ td.number {
 .tc_table .delete:before {
 	content: "\f00d";
 	padding-right: 1em;
+}
+
+.tc_table .hide {
+    display: none!important;
 }
 
 .tcActionMenu {
@@ -231,6 +244,10 @@ td.number {
 	.tc_table .jumbotron {
 		display: none;
 	}
+
+	.tcComment {
+		width: 100% !important;
+	}
 }
 
 .tcComment {
@@ -254,4 +271,16 @@ td.number {
 #CommentModal textarea {
 	width: 100%;
 	overflow: hidden;
+}
+
+#CommentModal .charactersLeft { text-align: right; }
+
+#CommentModal .charactersLeft span {
+	color: #ccc;
+	padding: 0.3em;
+	margin: 0.3em;
+}
+
+#CommentModal .minus {
+	background-color: #FCC;
 }

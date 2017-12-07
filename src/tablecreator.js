@@ -1,4 +1,4 @@
-/*global $, console, alert*/
+/*global $, console*/
 /*exported TableCreator*/
 
 /**
@@ -8,13 +8,13 @@
  * @license MIT
  */
 
-"use strict";
-
 String.prototype.isNumeric = function() {
+    "use strict";
     return !isNaN(parseFloat(this)) && isFinite(this);
 };
 
 Array.prototype.clean = function() {
+    "use strict";
     for(var i = 0; i < this.length; i++) {
         if(this[i] === "") {
             this.splice(i, 1);
@@ -29,6 +29,7 @@ Array.prototype.clean = function() {
  * @class 
  */
 function TableCreator(data, el) {
+    "use strict";
 
     /*
      * Always return a new instance of the TableCreator.
@@ -111,7 +112,7 @@ function TableCreator(data, el) {
      * to activate elements we have navigated to (i.e. by tabing).
      */
     this.el.onkeyup = function(evt) {
-        if (evt.which == 13 || evt.keyCode == 13) {
+        if (evt.which === 13 || evt.keyCode === 13) {
             evt.path[0].click();
         }
         console.log(evt);
@@ -134,6 +135,14 @@ function TableCreator(data, el) {
         createUrl: null,
         saveUrl: null,
         deleteUrl: null
+    };
+
+    /**
+     * Callbacks for activate()
+     */
+    this.activateCallbacks = [];
+    this.addActivateCallback = function(fn) {
+        this.activateCallbacks.push(fn);
     };
 
     /** 
@@ -191,6 +200,26 @@ function TableCreator(data, el) {
 
 
     /**
+     * Gets the table part of the definition.
+     * @memberOf TableCreator
+     *
+     * @return {object} this.data.table with id, settings etc.
+     */
+    this.getTableDefinitionInfo = function() {
+        return this.data && this.data.table;
+    };
+
+    /**
+     * Gets the thead.cols part of the definition containing the column definitions.
+     * @memberOf TableCreator
+     *
+     * @return {object[]} this.data.thead.cols.
+     */
+    this.getTableDefinitionColumns = function() {
+        return this.data && this.data.thead && this.data.thead.cols;
+    };
+
+    /**
      * Init - Loads settings from the json structure
      * @memberOf TableCreator
      *
@@ -234,13 +263,8 @@ function TableCreator(data, el) {
 
         $(".tcActionRow").removeClass("hide");
 
-        // bind click events to undo icons
         if ($('#EditModal').length === 0) {
-        // if (this.settings.hasEditModal === false) {
             this.createModal('Edit', 'Endring', 'Lukk', 'Lagre');
-            // this.createModal("tcEditModal", "Endring");
-            // $(el).after(editModal);
-            // this.settings.hasEditModal = true;
         }
         this.addEditLinks();
 
@@ -248,13 +272,6 @@ function TableCreator(data, el) {
             this.createModal('Undo', 'Angre', 'Lukk', 'Utfør');
         }
         this.addUndoLinks();
-        // Add undo modal if not created and bind click events to undo icons
-        // if (this.settings.hasUndoModal === false) {
-        //     var undoModal = this.createModal("tcUndoModal", "Angre");
-        //     $(el).after(undoModal);
-        //     this.settings.hasUndoModal = true;
-        // }
-        // this.addUndoLinks();
 
         if ($('#DeleteModal').length === 0) {
             this.createModal('Delete', 'Sletting', 'Avbryt', 'Slett');
@@ -272,11 +289,12 @@ function TableCreator(data, el) {
             });
         }
 
-        // Editable comment
         if ($('#CommentModal').length === 0) {
             this.createModal('Comment', 'Kommentar', 'Avbryt', 'Lagre');
         }
         this.addCommentLink();
+
+        this.activateCallbacks.forEach(this.callCallback);
 
         return this;
     };
@@ -307,17 +325,17 @@ function TableCreator(data, el) {
                 }
 
                 isVertical = data.table.settings.hasOwnProperty("dataOrientation") && 
-                    data.table.settings.dataOrientation == "vertical";
+                    data.table.settings.dataOrientation === "vertical";
 
                 tableClass += isVertical ? " vertical" : " horizontal";
             }
 
-            tableClass = (data.table.hasOwnProperty("class")) ? data.table.class : "";
+            tableClass += (data.table.hasOwnProperty("class")) ? data.table.class : "";
         }
 
         var html = "";
         if (title !== "") {
-            html += '<span>' + title + '</span>';
+            html += '<p class="tc_heading">' + title + '</p>';
         }
 
         html += '<table class="tc_table ' + tableClass + '">';
@@ -413,8 +431,8 @@ function TableCreator(data, el) {
                     var method = column[x].method;
                     var type = column[x].hasOwnProperty("type") ? column[x].type : '';
                     var answer = this.parseMethod(method, dataLine);
-                    answer = (type == 'number') ? this.formatData(answer, 'number') : 
-                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
+                    answer = (type === 'number') ? this.formatData(answer, 'number') : 
+                             (type === 'percent') ? this.formatData(answer, 'percent') : answer;
                     html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
 
                 }
@@ -523,8 +541,8 @@ function TableCreator(data, el) {
                 if (hasMethod) {
                     method = item.method;
                     answer = this.parseMethod(method, itemData);
-                    answer = (type == 'number') ? this.formatData(answer, 'number') :
-                             (type == 'percent') ? this.formatData(answer, 'percent') : answer;
+                    answer = (type === 'number') ? this.formatData(answer, 'number') :
+                             (type === 'percent') ? this.formatData(answer, 'percent') : answer;
                     html += '<td class="' + type + ' ' + hClass + '">' + answer + '</td>';
                 }
                 else {
@@ -594,6 +612,7 @@ function TableCreator(data, el) {
             default:
             case 'string':
             case undefined:
+                if (cValue === null || cValue === undefined) cValue = "";
                 html += '<td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '</td>';
                 break;
             case 'index':
@@ -667,13 +686,13 @@ function TableCreator(data, el) {
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 val = parts.join('.');
                 var nMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
-                val = (val.charAt(0) == '-') ? nMinus : val;
+                val = (val.charAt(0) === '-') ? nMinus : val;
                 break;
             case 'percent':
                 val = parseFloat(val).toFixed(precision);
-                val = isNaN(val) ? "0 %" : val + " %";
+                val = isNaN(val) ? "" : val + " %";
                 var pMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
-                val = (val.charAt(0) == '-') ? pMinus : val;
+                val = (val.charAt(0) === '-') ? pMinus : val;
                 break;
             default:
                 break;
@@ -816,7 +835,7 @@ function TableCreator(data, el) {
                     args.push(data[item]);
                 }
                 else if(item.charAt(0) === '-' && data.hasOwnProperty(item.slice(1))) {
-                    args.push(-data[item.slice(1)]);
+                    args.push(-parseFloat(data[item.slice(1)]));
                 }
                 else {  // can we find attribute in column definitions?
                     var sliced = item.slice(1);
@@ -899,6 +918,64 @@ function TableCreator(data, el) {
     };
 
     /**
+     * Insert data into row
+     * @param {Object} rowData Object with data
+     * @param {integer} [position] Which row to insert to
+     * @param {boolean} replace Should an existing row be replaced?
+     * @return void
+     */
+    this.insertRow = function(rowData, position, replace) {
+        var columns = this.getTableColumnIds();
+        var newRow = this.constructRowFromData(rowData, columns);
+
+        if(typeof position === 'number') {
+            var deleteCount = (typeof replace === 'boolean' && replace) ? 1 : 0;
+            this.data.tbody.splice(position, deleteCount, newRow);
+        } else {
+            this.data.tbody.push(newRow);
+        }
+    };
+
+    this.constructRowFromData = function(data, columns) {
+        var newRow = {};        
+        columns.forEach(function(column) {
+            data[column] && (newRow[column] = data[column]);
+        });
+        return newRow;
+    };
+
+    this.getTableColumnIds = function() {
+        var columnIds = [];
+        this.data.thead.cols.forEach(function(column) {
+            column.id && columnIds.push(column.id);
+        });
+        return columnIds;
+    };
+
+    /**
+     *  Get array of objects containing column id and attribute.
+     * @example
+     * getTableColumnAttribute("databind", true)
+     * // returns [{"id": "firstColumn", "databind": "MyBindValue"}, {"id":"secondColumn","databind":"MyBindValue2"}];
+     *
+     * @param {string} attribute Which one attribute to look for.
+     * @param {boolean} includeEmpty Include columns without the given attribute.
+     * @return {Object[]} Array of Objects containing members of "id" and *attribute*
+     */
+    this.getTableColumnAttribute = function(attribute, includeEmpty) {
+        var bindKeys = [];
+        this.data.thead.cols.forEach(function (column) {
+            if (column[attribute]) {
+                var obj = { id: column.id };
+                obj[attribute] = column[attribute];
+                bindKeys.push(obj);
+            }
+            !column[attribute] && column.id && includeEmpty && bindKeys.push({ "id": column.id });
+        });
+        return bindKeys;
+    };
+
+    /**
      * Create a modal
      * The ID of the submit button will be the modalId postfixed with _Save
      * @param {string} modalId The DOM ID to reference the returned modal
@@ -927,7 +1004,7 @@ function TableCreator(data, el) {
         $("body").append(modal);
 
         modal.on("keyup", function(evt) {
-            if(evt.which == 13 || evt.keyCode == 13) { // if Enter is released
+            if(evt.which === 13 || evt.keyCode === 13) { // if Enter is released
                 actionButton.click();
             }
             return true;
@@ -1061,10 +1138,10 @@ function TableCreator(data, el) {
                     break;
                 case 'number':
                     var frac = Math.pow(10,settings.settings.decimals);
-                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
                     break;
                 case 'percent':
-                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '"/>';
+                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
@@ -1133,12 +1210,19 @@ function TableCreator(data, el) {
         inputs.each(function(index, inputElement) {
             element = $(inputElement);
             key = element.attr('name').slice("tcEdit_".length);
-            if (element.val().length === 0) return;
             type = element.attr('type');
             value = element.val();
             if (type === 'checkbox') {
                 value = element.prop('checked');
                 hasCheckBox = true;
+            }
+            else if (type === 'number') {
+                value = element.val().lenght === 0 ? "0" :
+                        value === null ? "0" :
+                        value === "" ? "0" : value;
+            }
+            else if (element.val().length === 0) {
+                value = "";
             }
 
             dictionary.push({ "key": key, "value": value, "type": type });
@@ -1154,10 +1238,7 @@ function TableCreator(data, el) {
 
         var pool = null;
         if(hasCheckBox) {
-
-            pool = !!this.data ? 
-                    !!this.data.table ? 
-                     !!this.data.table.pool ?  this.data.table.pool : null : null : null;
+            pool = this.data && this.data.table && this.data.table.pool ? this.data.table.pool : null;
         }
 
         var row = this.data.tbody[rowIdx];
@@ -1171,7 +1252,11 @@ function TableCreator(data, el) {
             type = dictionary[x].hasOwnProperty("type") ? dictionary[x].type : null;
 
             // Test for NaN values
-            if (type == 'number') {
+            if (type === 'number') {
+                if(typeof value === "string") {
+                    value = value.replace(/\s/g, ''); // remove spaces (1 000 000) for parseFloat in IE where spaces are accepted in number input
+                    value = value.replace(/,/g, '.'); // replace all commas with dots, such that they are recognised as decimal separators
+                }
                 value = parseFloat(value);
                 if (row.hasOwnProperty(key)) row[key] = parseFloat(row[key]);
 
@@ -1184,26 +1269,20 @@ function TableCreator(data, el) {
                 value = value.toString();
             }
 
-            if (type == 'checkbox') {
-                if (value === false) continue;
-                if (value === true) {
-                    checkboxId = key.substring(key.lastIndexOf('_')+1, key.length);
-                    key = key.substring(0, key.lastIndexOf('_'));
-                    value = this.data.table.pool[key][checkboxId];
+            if (type === 'checkbox') {
+                checkboxId = key.substring(key.lastIndexOf('_')+1, key.length);
+                key = key.substring(0, key.lastIndexOf('_'));
 
-                    if (!row.hasOwnProperty(key)) {
-                        oldValues[key] = null;
-                        newValues[key] = [value];
-                    } 
-                    else {
-                        oldValues[key] = row[key];
-                        if (!newValues.hasOwnProperty(key) || newValues[key].constructor !== Array) 
-                            newValues[key] = [];
-
-                        newValues[key].push(value);
-                        continue;
-                    }
+                if (!newValues.hasOwnProperty(key) || newValues[key].constructor !== Array) {
+                    oldValues[key] = row[key] || null;
+                    newValues[key] = [];
                 }
+
+                if (value === true) {
+                    value = this.data.table.pool[key][checkboxId];
+                    newValues[key].push(value);
+                }
+                continue;
             }
 
             // Create objects with new and old values (do not track equal values)
@@ -1242,9 +1321,10 @@ function TableCreator(data, el) {
         var newUndo = { undo: row.undo };
         for (var y in oldValues) {
             if(oldValues.hasOwnProperty(y)) {
-                if (oldValues[y].constructor === Array) {
+                // multichoice
+                if (!!oldValues[y] && oldValues[y].constructor === Array) {
                     newUndo[y] = newUndo[y] || [];
-                    for (var n = 0; n < oldValues[y].lenght; ++n) {
+                    for (var n = 0; n < oldValues[y].length; ++n) {
                         newUndo[y][n] = this.decodeHtmlEntities(oldValues[y][n]);
                     }
                 }
@@ -1301,7 +1381,7 @@ function TableCreator(data, el) {
                     errorDiv.html('<p>Ikke lagret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
                     break;
                 default:
-                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + ').</p>');
+                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + '). Å laste siden på nytt vil kunne hjelpe (trykk F5 på tastaturet).</p>');
                     break;
             }
 
@@ -1434,7 +1514,7 @@ function TableCreator(data, el) {
         }
 
         for (var change in row.undo) {
-            if (row.undo.hasOwnProperty(change) && change !== "undo") {
+            if (row.undo.hasOwnProperty(change) && change !== "undo" && row.undo[change] !== null) {
                 requestObj[change] = row.undo[change];
             }
         }
@@ -1579,6 +1659,10 @@ function TableCreator(data, el) {
                         }
                         newRow[key].push(value);
                     }
+                } else if (element.is("input[type='number']")) {
+                    newRow[key] = value === "" ? "0" : 
+                                  value === null ? "0" : 
+                                  value.length === 0 ? "0" : value;
                 } else {
                     newRow[key] = value;
                 }
@@ -1667,11 +1751,6 @@ function TableCreator(data, el) {
             container.modal('hide');
             footer.find("i.fa").remove();
         }
-
-        // this.data.tbody.push(newRow);
-        // this.build().activate();
-        // container.modal('hide');
-
     };
 
     this.blankRowEditor = function() {
@@ -1727,12 +1806,12 @@ function TableCreator(data, el) {
                     var frac = Math.pow(10, settings.settings.decimals);
                     html += '<input type="number" class="form-control" ' + 
                         'step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" ' + 
-                        (value === null ? 'value="0"' : 'value="' + value + '"') + '/>';
+                        (value === null ? 'value="0"' : 'value="' + value + '"') + ' lang="nb"/>';
                     break;
                 case 'percent':
                     html += '<input type="number" class="form-control" ' + 
                         'step="0.1" name="tcEdit_' + id + '"' + 
-                        (value === null ? 'value="0"' : 'value="' + value + '"') + '/>';
+                        (value === null ? 'value="0"' : 'value="' + value + '"') + ' lang="nb"/>';
                     break;
                 case 'dropdown':
                     html += '<select class="form-control" name="tcEdit_' + id + '">';
@@ -1882,15 +1961,11 @@ function TableCreator(data, el) {
         var actionMenu = el.getElementsByClassName("tcActionMenu")[0];
         var editButton = $(actionMenu).find(".commentEdit");
         if (editButton.length === 0) {
-            editButton = $('<a class="tcActionRow commentEdit" tabindex="0">Rediger kommentar</a>');
+            var commentLength = !!this.data ? !!this.data.table ? !!this.data.table.comment ? this.data.table.comment.length : 0 : 0 : 0;
+            var actionCommand = commentLength > 0 ? "Endre" : "Legg til";
+            editButton = $('<a class="tcActionRow commentEdit" tabindex="0">' + actionCommand + ' kommentar</a>');
             $(actionMenu).append(editButton);
         }
-
-        // var editButton = $(comment).find(".commentEdit");
-        // if (editButton.length === 0) {
-        //     editButton = $('<span class="commentEdit"></span>');
-        //     $(comment).append(editButton);
-        // }
 
         editButton.on("click", editComment);
 
@@ -1903,15 +1978,20 @@ function TableCreator(data, el) {
         var ctx = this;
         var container = $('#CommentModal');
         var body = container.find(".modal-body");
-        // var commentArea = $('<textarea onkeyup="removeVertical(this);return false;"></textarea>');
-        var commentArea = $('<textarea onkeyup="$(this).val($(this).val().replace(/\\n/g, \'\')); this.style.height=(this.scrollHeight+2)+\'px\'; return false;"></textarea>');
+
+        var commentArea = $('<textarea onkeyup="TableCreator.updateCommentEditor(this); return false;"></textarea>');
+
         var comment = "";
         if(this.data.hasOwnProperty("table"))
             if (this.data.table.hasOwnProperty("comment"))
                 comment = this.data.table.comment;
 
         commentArea.val(this.decodeHtmlEntities(comment));
+
         body.html(commentArea);
+        body.append($('<div class="charactersLeft"><span>check</span></div>'));
+
+        this.constructor.updateCommentEditor(commentArea.get(0));
 
         var commentButton = container.find("#CommentSave");
         commentButton.off("click").on("click", commentClickEvent);
@@ -1929,8 +2009,10 @@ function TableCreator(data, el) {
         var ctx = this;
         var textarea = bodyElement.find("textarea");
         var comment = textarea.val();
-        console.log("escapedComment");
-        console.log({comment: comment});
+
+        if (comment.length > 900) {
+            return;
+        }
 
         var ajaxData = {
             SchemaId: this.settings.schemaId,
@@ -1982,9 +2064,22 @@ function TableCreator(data, el) {
 
     };
 
+    /********************************************************************************
+     *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY ***
+     *******************************************************************************/
+
+    /********************************************************************************
+     *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY *** UTILITY ***
+     *******************************************************************************/
+
     this.decodeHtmlEntities = function(s) { //https://github.com/jprichardson/string.js/blob/master/dist/string.js
         var ctx = this;
-        s = s || "";
+        s = s === 0 ? "0" :     // is number zero, then string with zero
+            s || "";            // if undefined or null: emptystring, else itself
         s = s.toString();
         // Licensed under MIT.
         // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
@@ -2014,261 +2109,122 @@ function TableCreator(data, el) {
     this.ENTITIES = {
         // Licensed under MIT.
         // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
-        "amp" : "&",
-        "gt" : ">",
-        "lt" : "<",
-        "quot" : "\"",
-        "apos" : "'",
-        "AElig" : 198,
-        "Aacute" : 193,
-        "Acirc" : 194,
-        "Agrave" : 192,
-        "Aring" : 197,
-        "Atilde" : 195,
-        "Auml" : 196,
-        "Ccedil" : 199,
-        "ETH" : 208,
-        "Eacute" : 201,
-        "Ecirc" : 202,
-        "Egrave" : 200,
-        "Euml" : 203,
-        "Iacute" : 205,
-        "Icirc" : 206,
-        "Igrave" : 204,
-        "Iuml" : 207,
-        "Ntilde" : 209,
-        "Oacute" : 211,
-        "Ocirc" : 212,
-        "Ograve" : 210,
-        "Oslash" : 216,
-        "Otilde" : 213,
-        "Ouml" : 214,
-        "THORN" : 222,
-        "Uacute" : 218,
-        "Ucirc" : 219,
-        "Ugrave" : 217,
-        "Uuml" : 220,
-        "Yacute" : 221,
-        "aacute" : 225,
-        "acirc" : 226,
-        "aelig" : 230,
-        "agrave" : 224,
-        "aring" : 229,
-        "atilde" : 227,
-        "auml" : 228,
-        "ccedil" : 231,
-        "eacute" : 233,
-        "ecirc" : 234,
-        "egrave" : 232,
-        "eth" : 240,
-        "euml" : 235,
-        "iacute" : 237,
-        "icirc" : 238,
-        "igrave" : 236,
-        "iuml" : 239,
-        "ntilde" : 241,
-        "oacute" : 243,
-        "ocirc" : 244,
-        "ograve" : 242,
-        "oslash" : 248,
-        "otilde" : 245,
-        "ouml" : 246,
-        "szlig" : 223,
-        "thorn" : 254,
-        "uacute" : 250,
-        "ucirc" : 251,
-        "ugrave" : 249,
-        "uuml" : 252,
-        "yacute" : 253,
-        "yuml" : 255,
-        "copy" : 169,
-        "reg" : 174,
-        "nbsp" : 160,
-        "iexcl" : 161,
-        "cent" : 162,
-        "pound" : 163,
-        "curren" : 164,
-        "yen" : 165,
-        "brvbar" : 166,
-        "sect" : 167,
-        "uml" : 168,
-        "ordf" : 170,
-        "laquo" : 171,
-        "not" : 172,
-        "shy" : 173,
-        "macr" : 175,
-        "deg" : 176,
-        "plusmn" : 177,
-        "sup1" : 185,
-        "sup2" : 178,
-        "sup3" : 179,
-        "acute" : 180,
-        "micro" : 181,
-        "para" : 182,
-        "middot" : 183,
-        "cedil" : 184,
-        "ordm" : 186,
-        "raquo" : 187,
-        "frac14" : 188,
-        "frac12" : 189,
-        "frac34" : 190,
-        "iquest" : 191,
-        "times" : 215,
-        "divide" : 247,
-        "OElig;" : 338,
-        "oelig;" : 339,
-        "Scaron;" : 352,
-        "scaron;" : 353,
-        "Yuml;" : 376,
-        "fnof;" : 402,
-        "circ;" : 710,
-        "tilde;" : 732,
-        "Alpha;" : 913,
-        "Beta;" : 914,
-        "Gamma;" : 915,
-        "Delta;" : 916,
-        "Epsilon;" : 917,
-        "Zeta;" : 918,
-        "Eta;" : 919,
-        "Theta;" : 920,
-        "Iota;" : 921,
-        "Kappa;" : 922,
-        "Lambda;" : 923,
-        "Mu;" : 924,
-        "Nu;" : 925,
-        "Xi;" : 926,
-        "Omicron;" : 927,
-        "Pi;" : 928,
-        "Rho;" : 929,
-        "Sigma;" : 931,
-        "Tau;" : 932,
-        "Upsilon;" : 933,
-        "Phi;" : 934,
-        "Chi;" : 935,
-        "Psi;" : 936,
-        "Omega;" : 937,
-        "alpha;" : 945,
-        "beta;" : 946,
-        "gamma;" : 947,
-        "delta;" : 948,
-        "epsilon;" : 949,
-        "zeta;" : 950,
-        "eta;" : 951,
-        "theta;" : 952,
-        "iota;" : 953,
-        "kappa;" : 954,
-        "lambda;" : 955,
-        "mu;" : 956,
-        "nu;" : 957,
-        "xi;" : 958,
-        "omicron;" : 959,
-        "pi;" : 960,
-        "rho;" : 961,
-        "sigmaf;" : 962,
-        "sigma;" : 963,
-        "tau;" : 964,
-        "upsilon;" : 965,
-        "phi;" : 966,
-        "chi;" : 967,
-        "psi;" : 968,
-        "omega;" : 969,
-        "thetasym;" : 977,
-        "upsih;" : 978,
-        "piv;" : 982,
-        "ensp;" : 8194,
-        "emsp;" : 8195,
-        "thinsp;" : 8201,
-        "zwnj;" : 8204,
-        "zwj;" : 8205,
-        "lrm;" : 8206,
-        "rlm;" : 8207,
-        "ndash;" : 8211,
-        "mdash;" : 8212,
-        "lsquo;" : 8216,
-        "rsquo;" : 8217,
-        "sbquo;" : 8218,
-        "ldquo;" : 8220,
-        "rdquo;" : 8221,
-        "bdquo;" : 8222,
-        "dagger;" : 8224,
-        "Dagger;" : 8225,
-        "bull;" : 8226,
-        "hellip;" : 8230,
-        "permil;" : 8240,
-        "prime;" : 8242,
-        "Prime;" : 8243,
-        "lsaquo;" : 8249,
-        "rsaquo;" : 8250,
-        "oline;" : 8254,
-        "frasl;" : 8260,
-        "euro;" : 8364,
-        "image;" : 8465,
-        "weierp;" : 8472,
-        "real;" : 8476,
-        "trade;" : 8482,
-        "alefsym;" : 8501,
-        "larr;" : 8592,
-        "uarr;" : 8593,
-        "rarr;" : 8594,
-        "darr;" : 8595,
-        "harr;" : 8596,
-        "crarr;" : 8629,
-        "lArr;" : 8656,
-        "uArr;" : 8657,
-        "rArr;" : 8658,
-        "dArr;" : 8659,
-        "hArr;" : 8660,
-        "forall;" : 8704,
-        "part;" : 8706,
-        "exist;" : 8707,
-        "empty;" : 8709,
-        "nabla;" : 8711,
-        "isin;" : 8712,
-        "notin;" : 8713,
-        "ni;" : 8715,
-        "prod;" : 8719,
-        "sum;" : 8721,
-        "minus;" : 8722,
-        "lowast;" : 8727,
-        "radic;" : 8730,
-        "prop;" : 8733,
-        "infin;" : 8734,
-        "ang;" : 8736,
-        "and;" : 8743,
-        "or;" : 8744,
-        "cap;" : 8745,
-        "cup;" : 8746,
-        "int;" : 8747,
-        "there4;" : 8756,
-        "sim;" : 8764,
-        "cong;" : 8773,
-        "asymp;" : 8776,
-        "ne;" : 8800,
-        "equiv;" : 8801,
-        "le;" : 8804,
-        "ge;" : 8805,
-        "sub;" : 8834,
-        "sup;" : 8835,
-        "nsub;" : 8836,
-        "sube;" : 8838,
-        "supe;" : 8839,
-        "oplus;" : 8853,
-        "otimes;" : 8855,
-        "perp;" : 8869,
-        "sdot;" : 8901,
-        "lceil;" : 8968,
-        "rceil;" : 8969,
-        "lfloor;" : 8970,
-        "rfloor;" : 8971,
-        "lang;" : 9001,
-        "rang;" : 9002,
-        "loz;" : 9674,
-        "spades;" : 9824,
-        "clubs;" : 9827,
-        "hearts;" : 9829,
-        "diams;" : 9830
+        // https://github.com/jprichardson/string.js/blob/master/dist/string.js
+        amp: "&", gt: ">", lt: "<", quot: "\"", apos: "'", AElig: 198, Aacute: 193, Acirc: 194, Agrave: 192, Aring: 197, Atilde: 195, Auml: 196, Ccedil: 199, ETH: 208, Eacute: 201, Ecirc: 202, Egrave: 200, Euml: 203, Iacute: 205, Icirc: 206, Igrave: 204, Iuml: 207, Ntilde: 209, Oacute: 211, Ocirc: 212, Ograve: 210, Oslash: 216, Otilde: 213, Ouml: 214, THORN: 222, Uacute: 218, Ucirc: 219, Ugrave: 217, Uuml: 220, Yacute: 221, aacute: 225, acirc: 226, aelig: 230, agrave: 224, aring: 229, atilde: 227, auml: 228, ccedil: 231, eacute: 233, ecirc: 234, egrave: 232, eth: 240, euml: 235, iacute: 237, icirc: 238, igrave: 236, iuml: 239, ntilde: 241, oacute: 243, ocirc: 244, ograve: 242, oslash: 248, otilde: 245, ouml: 246, szlig: 223, thorn: 254, uacute: 250, ucirc: 251, ugrave: 249, uuml: 252, yacute: 253, yuml: 255, copy: 169, reg: 174, nbsp: 160, iexcl: 161, cent: 162, pound: 163, curren: 164, yen: 165, brvbar: 166, sect: 167, uml: 168, ordf: 170, laquo: 171, not: 172, shy: 173, macr: 175, deg: 176, plusmn: 177, sup1: 185, sup2: 178, sup3: 179, acute: 180, micro: 181, para: 182, middot: 183, cedil: 184, ordm: 186, raquo: 187, frac14: 188, frac12: 189, frac34: 190, iquest: 191, times: 215, divide: 247, "OElig;": 338, "oelig;": 339, "Scaron;": 352, "scaron;": 353, "Yuml;": 376, "fnof;": 402, "circ;": 710, "tilde;": 732, "Alpha;": 913, "Beta;": 914, "Gamma;": 915, "Delta;": 916, "Epsilon;": 917, "Zeta;": 918, "Eta;": 919, "Theta;": 920, "Iota;": 921, "Kappa;": 922, "Lambda;": 923, "Mu;": 924, "Nu;": 925, "Xi;": 926, "Omicron;": 927, "Pi;": 928, "Rho;": 929, "Sigma;": 931, "Tau;": 932, "Upsilon;": 933, "Phi;": 934, "Chi;": 935, "Psi;": 936, "Omega;": 937, "alpha;": 945, "beta;": 946, "gamma;": 947, "delta;": 948, "epsilon;": 949, "zeta;": 950, "eta;": 951, "theta;": 952, "iota;": 953, "kappa;": 954, "lambda;": 955, "mu;": 956, "nu;": 957, "xi;": 958, "omicron;": 959, "pi;": 960, "rho;": 961, "sigmaf;": 962, "sigma;": 963, "tau;": 964, "upsilon;": 965, "phi;": 966, "chi;": 967, "psi;": 968, "omega;": 969, "thetasym;": 977, "upsih;": 978, "piv;": 982, "ensp;": 8194, "emsp;": 8195, "thinsp;": 8201, "zwnj;": 8204, "zwj;": 8205, "lrm;": 8206, "rlm;": 8207, "ndash;": 8211, "mdash;": 8212, "lsquo;": 8216, "rsquo;": 8217, "sbquo;": 8218, "ldquo;": 8220, "rdquo;": 8221, "bdquo;": 8222, "dagger;": 8224, "Dagger;": 8225, "bull;": 8226, "hellip;": 8230, "permil;": 8240, "prime;": 8242, "Prime;": 8243, "lsaquo;": 8249, "rsaquo;": 8250, "oline;": 8254, "frasl;": 8260, "euro;": 8364, "image;": 8465, "weierp;": 8472, "real;": 8476, "trade;": 8482, "alefsym;": 8501, "larr;": 8592, "uarr;": 8593, "rarr;": 8594, "darr;": 8595, "harr;": 8596, "crarr;": 8629, "lArr;": 8656, "uArr;": 8657, "rArr;": 8658, "dArr;": 8659, "hArr;": 8660, "forall;": 8704, "part;": 8706, "exist;": 8707, "empty;": 8709, "nabla;": 8711, "isin;": 8712, "notin;": 8713, "ni;": 8715, "prod;": 8719, "sum;": 8721, "minus;": 8722, "lowast;": 8727, "radic;": 8730, "prop;": 8733, "infin;": 8734, "ang;": 8736, "and;": 8743, "or;": 8744, "cap;": 8745, "cup;": 8746, "int;": 8747, "there4;": 8756, "sim;": 8764, "cong;": 8773, "asymp;": 8776, "ne;": 8800, "equiv;": 8801, "le;": 8804, "ge;": 8805, "sub;": 8834, "sup;": 8835, "nsub;": 8836, "sube;": 8838, "supe;": 8839, "oplus;": 8853, "otimes;": 8855, "perp;": 8869, "sdot;": 8901, "lceil;": 8968, "rceil;": 8969, "lfloor;": 8970, "rfloor;": 8971, "lang;": 9001, "rang;": 9002, "loz;": 9674, "spades;": 9824, "clubs;": 9827, "hearts;": 9829, "diams;": 9830
     };
 
+    this.callCallback = function (callbackObj) {
+        if (callbackObj && typeof callbackObj === 'object') {
+            var fn = callbackObj.fn,
+                ctx = callbackObj.ctx;
+
+            if (typeof fn === 'function' && !!ctx) {
+                return fn.call(ctx);
+            } else {
+                return fn.call({});
+            }
+        }
+    }
+
+    /** 
+     * Take an array and compare it with the content of the table.
+     * It will be used externally to check against table prefill to see
+     * if there are any changes.
+     *
+     * @example
+     * if (table.isEqualToTableRowArray(inputArray)) { ... }
+     *
+     * @param {Array} inArray - an Array with objects similar to this.data.tbody
+     * @returns {Boolean} Whether the table content and array content is considered equal
+     * @memberOf TableCreator
+     */
+    this.isEqualToTableRowArray = function(inArray) {
+        // not equal if input array is null/undefined or not an array
+        if(!inArray || inArray.constructor !== Array) {
+            return false;
+        }
+
+        // not equal if length is different
+        if (inArray.length !== this.data.tbody.length) {
+            return false;
+        }
+
+        // compare each element
+        var obj, tableObj;
+        for(var itr = 0; itr < inArray.length; ++itr) {
+            obj = inArray[itr];
+            tableObj = this.data.tbody[itr];
+
+            // if element in array is undefined, null or false in any way, return false
+            if (!obj || typeof obj !== 'object' || !tableObj || typeof tableObj !== 'object') {
+                return false;
+            }
+
+            // is in obj
+            for (var prop in obj) {
+                if(obj.hasOwnProperty(prop)) {
+                    // but not in tableObject
+                    if (!tableObj.hasOwnProperty(prop)) {
+                        return false;
+                    }
+                    // but is not equal to what is in tableObj
+                    else if (obj[prop] !== tableObj[prop]) {
+                        return false;
+                    }
+                }
+            }
+
+            // is in tableObj (in cases where it is here, but not in obj)
+            for (var tProp in tableObj) {
+                if (tableObj.hasOwnProperty(tProp)) {
+                    // but not in ojb and are not undo or isSaving
+                    if (!obj.hasOwnProperty(tProp)) {
+
+                        var change = tProp === 'undo' ? false :
+                                tProp === 'isSaving' ? false :
+                                !tableObj[tProp] ? false :
+                                tableObj[tProp] === "0" ? false :
+                                true;
+
+                        if (change) {
+                            return false;
+                        }                        
+                    }
+                }
+            }
+        }
+        // the array can be considered empty
+        return true;
+    };
 
     return this;
+} // End of TableCreator class
+
+
+TableCreator.updateCommentEditor = function(textarea) {
+    // remove newlines
+    textarea.value = textarea.value.replace(/\n/g, '');
+
+    // set textarea height
+    var highest = (textarea.scrollHeight > textarea.offsetHeight) ? textarea.scrollHeight : textarea.offsetHeight;
+    textarea.style.height = highest +'px'; 
+
+    // constrain length of comment
+    var length = textarea.value.length;
+    var pasteSpan = $("#CommentModal .charactersLeft span");
+    var charLeft = 900 - length;
+    pasteSpan.text(charLeft);
+    if (charLeft >= 0) {
+        textarea.classList.remove("minus");
+        $("#CommentModal #CommentSave").prop("disabled", false);
+    } else {
+        textarea.classList.add("minus");
+        $("#CommentModal #CommentSave").prop("disabled", true);
+    }
+};
+
+if(typeof window !== 'undefined') {
+    window.TableCreator = TableCreator;
+} else if (typeof global !== 'undefined') {
+    global.TableCreator = TableCreator;    
 }
