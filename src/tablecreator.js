@@ -939,7 +939,7 @@ function TableCreator(data, el) {
     this.constructRowFromData = function(data, columns) {
         var newRow = {};        
         columns.forEach(function(column) {
-            data[column] && (newRow[column] = data[column]);
+            (data[column] !== undefined) && (newRow[column] = data[column]);
         });
         return newRow;
     };
