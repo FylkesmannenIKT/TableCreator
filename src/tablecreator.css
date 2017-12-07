@@ -55,6 +55,11 @@
 	border-right: 1px solid black;
 }
 
+.tc_table.vertical tr:nth-last-child(2) th,
+.tc_table.vertical tr:nth-last-child(2) td {
+	bottom-border: 1px solid black;
+}
+
 .tc_table td.tcRightAlign {
 	text-align: right;
 }
