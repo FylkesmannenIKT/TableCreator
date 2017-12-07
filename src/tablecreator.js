@@ -255,13 +255,8 @@ function TableCreator(data, el) {
 
         $(".tcActionRow").removeClass("hide");
 
-        // bind click events to undo icons
         if ($('#EditModal').length === 0) {
-        // if (this.settings.hasEditModal === false) {
             this.createModal('Edit', 'Endring', 'Lukk', 'Lagre');
-            // this.createModal("tcEditModal", "Endring");
-            // $(el).after(editModal);
-            // this.settings.hasEditModal = true;
         }
         this.addEditLinks();
 
@@ -269,13 +264,6 @@ function TableCreator(data, el) {
             this.createModal('Undo', 'Angre', 'Lukk', 'Utfør');
         }
         this.addUndoLinks();
-        // Add undo modal if not created and bind click events to undo icons
-        // if (this.settings.hasUndoModal === false) {
-        //     var undoModal = this.createModal("tcUndoModal", "Angre");
-        //     $(el).after(undoModal);
-        //     this.settings.hasUndoModal = true;
-        // }
-        // this.addUndoLinks();
 
         if ($('#DeleteModal').length === 0) {
             this.createModal('Delete', 'Sletting', 'Avbryt', 'Slett');
@@ -293,7 +281,6 @@ function TableCreator(data, el) {
             });
         }
 
-        // Editable comment
         if ($('#CommentModal').length === 0) {
             this.createModal('Comment', 'Kommentar', 'Avbryt', 'Lagre');
         }
