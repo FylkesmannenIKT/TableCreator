@@ -1,6 +1,6 @@
 {
   "name": "tablecreator",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "A javascript application for tranforming a specific json structure to a table.",
   "main": "tablecreator.js",
   "scripts": {
