@@ -1,21 +1,49 @@
-/*global $, console*/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: tablecreator.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: tablecreator.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*global $, console*/
 /*exported TableCreator*/
 
 /**
  * @fileoverview TableCreator
  * @copyright Fylkesmannen i Sogn og Fjordane 2016
- * @author Per Kristian Warvik <fmsfpkw@fylkesmannen.no>
+ * @author Per Kristian Warvik &lt;fmsfpkw@fylkesmannen.no>
  * @license MIT
  */
 
 String.prototype.isNumeric = function() {
     "use strict";
-    return !isNaN(parseFloat(this)) && isFinite(this);
+    return !isNaN(parseFloat(this)) &amp;&amp; isFinite(this);
 };
 
 Array.prototype.clean = function() {
     "use strict";
-    for(var i = 0; i < this.length; i++) {
+    for(var i = 0; i &lt; this.length; i++) {
         if(this[i] === "") {
             this.splice(i, 1);
         }
@@ -206,7 +234,7 @@ function TableCreator(data, el) {
      * @return {object} this.data.table with id, settings etc.
      */
     this.getTableDefinitionInfo = function() {
-        return this.data && this.data.table;
+        return this.data &amp;&amp; this.data.table;
     };
 
     /**
@@ -216,7 +244,7 @@ function TableCreator(data, el) {
      * @return {object[]} this.data.thead.cols.
      */
     this.getTableDefinitionColumns = function() {
-        return this.data && this.data.thead && this.data.thead.cols;
+        return this.data &amp;&amp; this.data.thead &amp;&amp; this.data.thead.cols;
     };
 
     /**
@@ -280,7 +308,7 @@ function TableCreator(data, el) {
 
         if(this.settings.isResizable) {
             var ctx = this;
-            var addRowLink = $('<a class="tcActionRow add" tabindex="0">Legg til ny rad</a>');
+            var addRowLink = $('&lt;a class="tcActionRow add" tabindex="0">Legg til ny rad&lt;/a>');
             var actionMenu = $(this.el).find(".tcActionMenu");
             actionMenu.append(addRowLink);
 
@@ -324,7 +352,7 @@ function TableCreator(data, el) {
                     }
                 }
 
-                isVertical = data.table.settings.hasOwnProperty("dataOrientation") && 
+                isVertical = data.table.settings.hasOwnProperty("dataOrientation") &amp;&amp; 
                     data.table.settings.dataOrientation === "vertical";
 
                 tableClass += isVertical ? " vertical" : " horizontal";
@@ -335,10 +363,10 @@ function TableCreator(data, el) {
 
         var html = "";
         if (title !== "") {
-            html += '<p class="tc_heading">' + title + '</p>';
+            html += '&lt;p class="tc_heading">' + title + '&lt;/p>';
         }
 
-        html += '<table class="tc_table ' + tableClass + '">';
+        html += '&lt;table class="tc_table ' + tableClass + '">';
 
         if (isVertical) {
             html += this.printVerticalTableContent(data);
@@ -346,11 +374,11 @@ function TableCreator(data, el) {
             html += this.printHorizontalTableContent(data);
         }
 
-        html += '</table>';
-        html += '<div class="tcActionMenu"></div>';
-        html += '<div class="tcComment">' +
-                    '<span class="comment"></span>' +
-                '</div>';
+        html += '&lt;/table>';
+        html += '&lt;div class="tcActionMenu">&lt;/div>';
+        html += '&lt;div class="tcComment">' +
+                    '&lt;span class="comment">&lt;/span>' +
+                '&lt;/div>';
 
         el.innerHTML = html;
 
@@ -372,32 +400,32 @@ function TableCreator(data, el) {
      * displayed horizontally.
      *
      * @param {object} data - The data structure with table structure and table data.
-     * @return string - html string starting with &lt;thead&gt;, ending with &lt;/tfoot&gt;
+     * @return string - html string starting with &amp;lt;thead&amp;gt;, ending with &amp;lt;/tfoot&amp;gt;
      * @memberOf TableCreator
      */
     this.printHorizontalTableContent = function(data) {
-        var html = "<thead>";
+        var html = "&lt;thead>";
         /**
          * Iterate over rows in data.thead to create headings in the table
          */
-        for (var headrow = 0; headrow < data.thead.rows.length; ++headrow) {
+        for (var headrow = 0; headrow &lt; data.thead.rows.length; ++headrow) {
             var rowList = data.thead.rows[headrow];
-            html += '<tr>';
-            for (var hrCol = 0; hrCol < rowList.length; ++hrCol) {
+            html += '&lt;tr>';
+            for (var hrCol = 0; hrCol &lt; rowList.length; ++hrCol) {
                 var hrColumn = rowList[hrCol];
                 var colspan = hrColumn.hasOwnProperty("colspan") ? ' colspan="' + hrColumn.colspan + '"' : '';
                 var ctitle = hrColumn.hasOwnProperty("title") ? hrColumn.title : '';
                 var hClass = hrColumn.hasOwnProperty("class") ? ' '+hrColumn.class : '';
-                html += '<th class="tcTableHeaders' + hClass + '"' + colspan + '>' + ctitle + '</th>';
+                html += '&lt;th class="tcTableHeaders' + hClass + '"' + colspan + '>' + ctitle + '&lt;/th>';
             }
-            html += '</tr>';
+            html += '&lt;/tr>';
         }
 
         /**
          * Iterate over cols in data.thead to create column headings in thead of table
          */
-        html += '<tr>';
-        for (var col = 0; col < data.thead.cols.length; ++col) {
+        html += '&lt;tr>';
+        for (var col = 0; col &lt; data.thead.cols.length; ++col) {
             var headerRow = data.thead.cols[col];
             var headerTitle = headerRow.hasOwnProperty("title") ? headerRow.title : '';
             var cClass = headerRow.hasOwnProperty("class") ? headerRow.class : '';
@@ -405,23 +433,23 @@ function TableCreator(data, el) {
             cClass += headerRow.type === "string" ? ' tcLeftAlign' : '';
             cClass += headerRow.type === "multichoice" ? ' tcLeftAlign' : '';
             cClass += !headerRow.hasOwnProperty("type") ? ' tcLeftAlign' : '';
-            html += '<th class="' + cClass + '">' + headerTitle + '</th>';
+            html += '&lt;th class="' + cClass + '">' + headerTitle + '&lt;/th>';
         }
-        html += '</tr>';
+        html += '&lt;/tr>';
 
         /**
          * Iterate over the array in tbody to create one tbody row for each contained object.
          */
-        html += '</thead><tbody>';
-        for (var line = 0; line < data.tbody.length; ++line)
+        html += '&lt;/thead>&lt;tbody>';
+        for (var line = 0; line &lt; data.tbody.length; ++line)
         {
             var dataLine = data.tbody[line];
 
-            html += '<tr>';
+            html += '&lt;tr>';
 
             var column = data.thead.cols;
 
-            for (var x = 0; x < column.length; ++x)
+            for (var x = 0; x &lt; column.length; ++x)
             {
                 var id = column[x].id;
                 var value = dataLine.hasOwnProperty(id) ? dataLine[id] : "";
@@ -433,7 +461,7 @@ function TableCreator(data, el) {
                     var answer = this.parseMethod(method, dataLine);
                     answer = (type === 'number') ? this.formatData(answer, 'number') : 
                              (type === 'percent') ? this.formatData(answer, 'percent') : answer;
-                    html += '<td class="' + type + ' ' + cls + '">' + answer + '</td>';
+                    html += '&lt;td class="' + type + ' ' + cls + '">' + answer + '&lt;/td>';
 
                 }
                 else
@@ -441,36 +469,36 @@ function TableCreator(data, el) {
                     html += this.printCell(column[x].type, cls, value, column[x], dataLine, line);
                 }
             }
-            html += '</tr>';
+            html += '&lt;/tr>';
         }
-        html += '</tbody>';
+        html += '&lt;/tbody>';
 
         /**
          * If tfoot has an array in cols property, iterate over it to produce bottom row (possibly with calculations)
          */
-        if(data.tfoot.hasOwnProperty("cols") && Array.isArray(data.tfoot.cols) && data.tfoot.cols.length > 0) {
-            html += '<tfoot><tr>';
-            for (var y = 0; y < data.tfoot.cols.length; ++y)
+        if(data.tfoot.hasOwnProperty("cols") &amp;&amp; Array.isArray(data.tfoot.cols) &amp;&amp; data.tfoot.cols.length > 0) {
+            html += '&lt;tfoot>&lt;tr>';
+            for (var y = 0; y &lt; data.tfoot.cols.length; ++y)
             {
                 var fCol = data.tfoot.cols[y];
                 var globalClass = '';
                 var footValue;
-                if(y < data.thead.cols.length) {
+                if(y &lt; data.thead.cols.length) {
                     globalClass = data.thead.cols[y].hasOwnProperty("class") ? data.thead.cols[y].class : '';
                 }
                 var localClass = fCol.hasOwnProperty("class") ? fCol.class : '';
                 if(fCol.hasOwnProperty("title")) {
-                    html += '<td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '</td>';
+                    html += '&lt;td class="' + globalClass + ' ' + localClass + ' string">' + fCol.title + '&lt;/td>';
                 }
                 else if (fCol.hasOwnProperty("method")) {
                     footValue = this.parseMethod(fCol.method, data);
-                    html += '<td class="' + globalClass + ' ' + localClass + ' number">' + this.formatData(footValue, 'number') + '</td>';
+                    html += '&lt;td class="' + globalClass + ' ' + localClass + ' number">' + this.formatData(footValue, 'number') + '&lt;/td>';
                 }
                 else {
-                    html += '<td class="' + globalClass + '"></td>';
+                    html += '&lt;td class="' + globalClass + '">&lt;/td>';
                 }
             }
-            html += '</tfoot></tr>';
+            html += '&lt;/tfoot>&lt;/tr>';
         }
 
         return html;        
@@ -481,7 +509,7 @@ function TableCreator(data, el) {
      * displayed vertically.
      *
      * @param {object} data - The data structure with table structure and table data.
-     * @return string - html string starting with &lt;tbody&gt;, ending with &lt;/tbody&gt;
+     * @return string - html string starting with &amp;lt;tbody&amp;gt;, ending with &amp;lt;/tbody&amp;gt;
      * @memberOf TableCreator
      */
     this.printVerticalTableContent = function(data) {
@@ -490,16 +518,16 @@ function TableCreator(data, el) {
         var hSpanCounter = [];  // array to keep track of index to current hSpan
         var hSpanRest = [];     // array to keep track of remaining rows for current hSpan ([3,2,1] for colspan="3")
 
-        for (var column = 0; column < data.thead.cols.length; ++column) {
-            html += '<tr>';
+        for (var column = 0; column &lt; data.thead.cols.length; ++column) {
+            html += '&lt;tr>';
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // print <th> for rowspan before row-definition
+            // print &lt;th> for rowspan before row-definition
 
             var rTitle, hClass, item, itemData, id, type, value, hasMethod;
             var hSpanIdx, hSpanLeft, rowspan;
 
-            for (var hCol = 0; hCol < hSpans.length; ++hCol) {
+            for (var hCol = 0; hCol &lt; hSpans.length; ++hCol) {
                 hSpanIdx = hSpanCounter[hCol] || 0;
                 hSpanLeft = hSpanRest[hCol] || 0;
                 item = hSpans[hCol][hSpanIdx];
@@ -512,7 +540,7 @@ function TableCreator(data, el) {
                 rowspan = item.hasOwnProperty("colspan") ? ' rowspan="' + item.colspan + '"' : '';
                 rTitle = item.hasOwnProperty("title") ? item.title : '';
                 hClass = item.hasOwnProperty("class") ? ' ' + item.class : '';
-                html += '<th class="tcTableHeaders' + hClass + '"' + rowspan + '>' + rTitle + '</th>';
+                html += '&lt;th class="tcTableHeaders' + hClass + '"' + rowspan + '>' + rTitle + '&lt;/th>';
 
                 hSpanCounter[hCol] = hSpanCounter[hCol] + 1 || 1;   // increment 1 or init to 1
                 hSpanRest[hCol] = (item.colspan - 1) || 0;
@@ -520,22 +548,22 @@ function TableCreator(data, el) {
 
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // print <th> for row name
+            // print &lt;th> for row name
             item = data.thead.cols[column];
             rTitle = item.hasOwnProperty("title") ? item.title : '';
             hClass = item.hasOwnProperty("class") ? ' ' + item.class : '';
             type = item.hasOwnProperty("type") ? item.type : "string";
             // hClass += (type === "number") ? ' number' : ' tcLeftAlign';
-            html += '<th class="' + hClass + ' tcLeftAlign">' + rTitle + '</th>';
+            html += '&lt;th class="' + hClass + ' tcLeftAlign">' + rTitle + '&lt;/th>';
 
             id = item.id;
             hasMethod = item.hasOwnProperty("method");
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // print <td> for n'th item where n=tbody[x] and value like tbody[x][item]
+            // print &lt;td> for n'th item where n=tbody[x] and value like tbody[x][item]
             var method, answer;
 
-            for (var dataItr = 0; dataItr < data.tbody.length; ++dataItr) {
+            for (var dataItr = 0; dataItr &lt; data.tbody.length; ++dataItr) {
                 itemData = data.tbody[dataItr];
                 value = itemData.hasOwnProperty(id) ? itemData[id] : '';
                 if (hasMethod) {
@@ -543,7 +571,7 @@ function TableCreator(data, el) {
                     answer = this.parseMethod(method, itemData);
                     answer = (type === 'number') ? this.formatData(answer, 'number') :
                              (type === 'percent') ? this.formatData(answer, 'percent') : answer;
-                    html += '<td class="' + type + ' ' + hClass + '">' + answer + '</td>';
+                    html += '&lt;td class="' + type + ' ' + hClass + '">' + answer + '&lt;/td>';
                 }
                 else {
                     html += this.printCell(type, hClass, value, item, itemData, dataItr);
@@ -551,41 +579,41 @@ function TableCreator(data, el) {
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////////////
-            // print <td> for tfoot values
-            if (data.hasOwnProperty("tfoot") &&
-                data.tfoot.hasOwnProperty("cols") &&
-                Array.isArray(data.tfoot.cols) &&
+            // print &lt;td> for tfoot values
+            if (data.hasOwnProperty("tfoot") &amp;&amp;
+                data.tfoot.hasOwnProperty("cols") &amp;&amp;
+                Array.isArray(data.tfoot.cols) &amp;&amp;
                 data.tfoot.cols.length > 0) {
 
-                if (column < data.tfoot.cols.length) {
+                if (column &lt; data.tfoot.cols.length) {
                     var footObject = data.tfoot.cols[column];
                     var foClass = (footObject.hasOwnProperty("class")) ? ' ' + footObject.class : '';
 
                     var fClass = hClass + foClass;
                     if (footObject.hasOwnProperty("title"))
-                        html += '<td class="' + fClass + ' string">' + footObject.title + '</td>';
+                        html += '&lt;td class="' + fClass + ' string">' + footObject.title + '&lt;/td>';
                     else if (footObject.hasOwnProperty("method")) {
                         value = this.parseMethod(footObject.method, data);
-                        html += '<td class="' + fClass + ' number">' + this.formatData(value, 'number') + '</td>';
+                        html += '&lt;td class="' + fClass + ' number">' + this.formatData(value, 'number') + '&lt;/td>';
                     }
                     else {
-                        html += '<td class="' + fClass + '"></td>';
+                        html += '&lt;td class="' + fClass + '">&lt;/td>';
                     }
                 }
                 else {
-                    html += '<td class="' + hClass + '"></td>';
+                    html += '&lt;td class="' + hClass + '">&lt;/td>';
                 }
 
             }
 
-            html += '</tr>';
+            html += '&lt;/tr>';
         } // end for each thead.col
 
         return html;
     };
 
     /** 
-     * Building a <td> html string with the content for a cell. Different types of data is parsed properly.
+     * Building a &lt;td> html string with the content for a cell. Different types of data is parsed properly.
      *
      * @param {string} cType - the type of data: one of ['method', 'number', 'percent', 'string', undefined, 'index', 'actionArray']
      * @param {string} cClass - classes that will be written in the class="" attribute
@@ -593,7 +621,7 @@ function TableCreator(data, el) {
      * @param {object} item - column object defining stuff for the cell
      * @param {object} itemData - data object containing stuff for the cell
      * @param {number} refIdx - data object index in data.tbody[]
-     * @return string - html string starting with &lt;td&gt;, ending with &lt;/td&gt;
+     * @return string - html string starting with &amp;lt;td&amp;gt;, ending with &amp;lt;/td&amp;gt;
      * @memberOf TableCreator
      */
     this.printCell = function (cType, cClass, cValue, item, itemData, refIdx) {
@@ -601,60 +629,60 @@ function TableCreator(data, el) {
         switch(cType) {
             case 'method':
                 cValue = this.parseMethod(cValue, itemData);
-                html += '<td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'number') + '</td>';
+                html += '&lt;td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'number') + '&lt;/td>';
                 break;
             case 'number':
-                html += '<td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'number') + '</td>';
+                html += '&lt;td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'number') + '&lt;/td>';
                 break;
             case 'percent':
-                html += '<td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'percent') + '</td>';
+                html += '&lt;td class="' + cType + ' ' + cClass + '">' + this.formatData(cValue, 'percent') + '&lt;/td>';
                 break;
             default:
             case 'string':
             case undefined:
                 if (cValue === null || cValue === undefined) cValue = "";
-                html += '<td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '</td>';
+                html += '&lt;td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '&lt;/td>';
                 break;
             case 'index':
-                html += '<td>' + (refIdx+1) + '</td>';
+                html += '&lt;td>' + (refIdx+1) + '&lt;/td>';
                 break;
             case 'multichoice':
                 if (cValue.constructor === Array) {
                     cValue = cValue.join(', ');
                 }
-                html += '<td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '</td>';
+                html += '&lt;td class="tcLeftAlign ' + cType + ' ' + cClass + '">' + cValue + '&lt;/td>';
                 break;
             case 'actionArray':
-                html += '<td class="tcActionRow hide ' + cClass + '">';
+                html += '&lt;td class="tcActionRow hide ' + cClass + '">';
 
                 // Add spinner if column is cached while saving to server
                 var isSaving = itemData.hasOwnProperty("isSaving") ? itemData.isSaving : false;
                 if(isSaving === true ) {
-                    html += '<i class="fa fa-refresh fa-spin"></i>';
+                    html += '&lt;i class="fa fa-refresh fa-spin">&lt;/i>';
                 }
 
                 // add action icons for a column
                 var actions = item.hasOwnProperty("actions") ? item.actions : null;
-                if(actions !== null && actions.constructor === Array ) {
-                    for(var a = 0; a < actions.length; ++a) {
+                if(actions !== null &amp;&amp; actions.constructor === Array ) {
+                    for(var a = 0; a &lt; actions.length; ++a) {
                         switch(actions[a]) {
                             case 'undo':
-                                if(itemData.hasOwnProperty("undo") && itemData.undo !== null) {
-                                    html += '<a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + refIdx + '" tabindex="0">angre</a>';
+                                if(itemData.hasOwnProperty("undo") &amp;&amp; itemData.undo !== null) {
+                                    html += '&lt;a title="Angre" class="tcAction undo" data-tc_action="undo" data-tc_row="' + refIdx + '" tabindex="0">angre&lt;/a>';
                                 }
                                 break;
                             case 'edit':
-                                html += '<a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + refIdx + '" tabindex="0">rediger</a>';
+                                html += '&lt;a title="Rediger" class="tcAction edit" data-tc_action="edit" data-tc_row="' + refIdx + '" tabindex="0">rediger&lt;/a>';
                                 break;
                             case 'delete':
                                 if (this.settings.isResizable)
-                                    html += '<a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + refIdx + '" tabindex="0">slett</a>';
+                                    html += '&lt;a title="Slett" class="tcAction delete" data-tc_action="delete" data-tc_row="' + refIdx + '" tabindex="0">slett&lt;/a>';
                                 break;
                         }
                     }
                 }
 
-                html += '</td>';
+                html += '&lt;/td>';
                 break;
         }
         return html;
@@ -685,13 +713,13 @@ function TableCreator(data, el) {
                 var parts = val.toString().split('.');
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 val = parts.join('.');
-                var nMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
+                var nMinus = '&lt;span class="minus">' + val.replace('-', '- ') + '&lt;/span>';
                 val = (val.charAt(0) === '-') ? nMinus : val;
                 break;
             case 'percent':
                 val = parseFloat(val).toFixed(precision);
                 val = isNaN(val) ? "" : val + " %";
-                var pMinus = '<span class="minus">' + val.replace('-', '- ') + '</span>';
+                var pMinus = '&lt;span class="minus">' + val.replace('-', '- ') + '&lt;/span>';
                 val = (val.charAt(0) === '-') ? pMinus : val;
                 break;
             default:
@@ -703,7 +731,7 @@ function TableCreator(data, el) {
     /**
      * Object containing arithmetic methods (method name as key and function([array of numbers]) as values).
      * @memberOf TableCreator
-     * @param {Array.<Number>}
+     * @param {Array.&lt;Number>}
      * @example
      * // returns 15
      * methods["sum"]([5,10]);
@@ -712,7 +740,7 @@ function TableCreator(data, el) {
     this.methods = {
       "sum" : function(args) {
         var total = 0;
-        for (var arg = 0; arg < args.length; ++arg) {
+        for (var arg = 0; arg &lt; args.length; ++arg) {
             // += 0 if empty, undefined or whitespace
             total += (!args[arg] || /^\s*$/.test(args[arg])) ? 0 : parseFloat(args[arg]);
         }
@@ -720,7 +748,7 @@ function TableCreator(data, el) {
       },
       "avg" : function(args) {
         var total = 0;
-        for (var arg = 0; arg < args.length; ++arg) {
+        for (var arg = 0; arg &lt; args.length; ++arg) {
             // += 0 if empty, undefined or whitespace
             total += (!args[arg] || /^\s*$/.test(args[arg])) ? 0 : parseFloat(args[arg]);
         }
@@ -730,7 +758,7 @@ function TableCreator(data, el) {
         if (args.length === 0) return NaN;
         if (args.length === 1) return args[0];
         var dividend = parseFloat(args[0]);
-        for (var index = 1; index < args.length; ++index) {
+        for (var index = 1; index &lt; args.length; ++index) {
             var divisor = parseFloat(args[index]);
             if (divisor === 0 || isNaN(divisor)){
                 return NaN;
@@ -740,9 +768,9 @@ function TableCreator(data, el) {
         return dividend;
       },
       "mult" : function(args) {
-        if (args.length < 1) return NaN;
+        if (args.length &lt; 1) return NaN;
         var total = args[0];
-        for (var arg = 1; arg < args.length; ++arg) {
+        for (var arg = 1; arg &lt; args.length; ++arg) {
             // *= 1 if empty, undefined or whitespace
             total *= (!args[arg] || /^\s*$/.test(args[arg])) ? 1 : args[arg];
         }
@@ -758,8 +786,8 @@ function TableCreator(data, el) {
     };
 
     /** 
-     * Calculate an answer with a method, passing in parameters(numbers or properties in data).<br/>
-     * <pre>If the data contains tbody:
+     * Calculate an answer with a method, passing in parameters(numbers or properties in data).&lt;br/>
+     * &lt;pre>If the data contains tbody:
      *     Iterate over param in paramArray
      *         If a parameter is a number, it is ready for calculation.
      *         If a parameter is a string:
@@ -769,7 +797,7 @@ function TableCreator(data, el) {
      *         If number, save in array
      *         If parama exists as a property, save in array (with or without minus)
      *  Calculate with the method and the numbers that has been found.       
-     * </pre>
+     * &lt;/pre>
      *
      * @example
      * // returns 15
@@ -787,7 +815,7 @@ function TableCreator(data, el) {
         if (data.hasOwnProperty("tbody")) {
             var columns = data.thead.cols;
             var rows = data.tbody;
-            for (var i = 0; i < paramArray.length; ++i) {
+            for (var i = 0; i &lt; paramArray.length; ++i) {
                 var param = paramArray[i];
                 
                 // param is a number and can be calculated directly
@@ -797,14 +825,14 @@ function TableCreator(data, el) {
                 }
 
                 var minus = false;
-                if(typeof param === 'string' && param.charAt(0) === '-') {
+                if(typeof param === 'string' &amp;&amp; param.charAt(0) === '-') {
                     minus = true;
                     param = param.slice(1);
                 }
 
                 // find column definition
                 var headObject = null;
-                for (var c = 0; c < columns.length; ++c) {
+                for (var c = 0; c &lt; columns.length; ++c) {
                     if(columns[c].id === param) {
                         headObject = columns[c];
                         break;
@@ -812,13 +840,13 @@ function TableCreator(data, el) {
                 }
 
                 // param is a method at column level (colHeader, colDefinition)
-                if (headObject !== null && headObject.hasOwnProperty("method")) {
+                if (headObject !== null &amp;&amp; headObject.hasOwnProperty("method")) {
                     var columnResult = this.parseMethod(headObject.method, data);
                     args.push((minus) ? -columnResult : columnResult);
                     continue;
                 }
 
-                for (var j = 0; j < rows.length; ++j) {
+                for (var j = 0; j &lt; rows.length; ++j) {
                     var row = rows[j];
                     if (row.hasOwnProperty(param)) {
 
@@ -836,7 +864,7 @@ function TableCreator(data, el) {
                 }
             }
         } else {    // we deal with a row-object from tbody
-            for (var k = 0; k < paramArray.length; ++k) {
+            for (var k = 0; k &lt; paramArray.length; ++k) {
                 var item = paramArray[k];
                 if(typeof item === 'number') {
                     args.push(item);
@@ -844,13 +872,13 @@ function TableCreator(data, el) {
                 else if(data.hasOwnProperty(item)) {
                     args.push(data[item]);
                 }
-                else if(item.charAt(0) === '-' && data.hasOwnProperty(item.slice(1))) {
+                else if(item.charAt(0) === '-' &amp;&amp; data.hasOwnProperty(item.slice(1))) {
                     args.push(-parseFloat(data[item.slice(1)]));
                 }
                 else {  // can we find attribute in column definitions?
                     var sliced = item.slice(1);
                     var cols = this.data.thead.cols;
-                    for (var l = 0; l < cols.length; ++l) {
+                    for (var l = 0; l &lt; cols.length; ++l) {
                         if (cols[l].id === item || cols[l].id === sliced) {
                             if (cols[l].hasOwnProperty("method")) {
                                 var colResult = this.parseMethod(cols[l].method, data);
@@ -891,7 +919,7 @@ function TableCreator(data, el) {
         var argArrayStack = [[]];
         var operatorStack = [];
 
-        for (var x = 0; x < parts.length; ++x) {
+        for (var x = 0; x &lt; parts.length; ++x) {
             var token = parts[x];
             // methods
             if (this.methods.hasOwnProperty(token)) {
@@ -939,7 +967,7 @@ function TableCreator(data, el) {
         var newRow = this.constructRowFromData(rowData, columns);
 
         if(typeof position === 'number') {
-            var deleteCount = (typeof replace === 'boolean' && replace) ? 1 : 0;
+            var deleteCount = (typeof replace === 'boolean' &amp;&amp; replace) ? 1 : 0;
             this.data.tbody.splice(position, deleteCount, newRow);
         } else {
             this.data.tbody.push(newRow);
@@ -949,7 +977,7 @@ function TableCreator(data, el) {
     this.constructRowFromData = function(data, columns) {
         var newRow = {};        
         columns.forEach(function(column) {
-            (data[column] !== undefined) && (newRow[column] = data[column]);
+            (data[column] !== undefined) &amp;&amp; (newRow[column] = data[column]);
         });
         return newRow;
     };
@@ -957,7 +985,7 @@ function TableCreator(data, el) {
     this.getTableColumnIds = function() {
         var columnIds = [];
         this.data.thead.cols.forEach(function(column) {
-            column.id && columnIds.push(column.id);
+            column.id &amp;&amp; columnIds.push(column.id);
         });
         return columnIds;
     };
@@ -980,7 +1008,7 @@ function TableCreator(data, el) {
                 obj[attribute] = column[attribute];
                 bindKeys.push(obj);
             }
-            !column[attribute] && column.id && includeEmpty && bindKeys.push({ "id": column.id });
+            !column[attribute] &amp;&amp; column.id &amp;&amp; includeEmpty &amp;&amp; bindKeys.push({ "id": column.id });
         });
         return bindKeys;
     };
@@ -993,18 +1021,18 @@ function TableCreator(data, el) {
      * @return jQuery DOM element containing the modal
      */
     this.createModal = function (id, headline, dismissLabel, submitLabel) {
-        var header = $('<div class="modal-header">');
-        var body = $('<div class="modal-body">');
-        var footer = $('<div class="modal-footer">');
-        var actionButton = $('<button type="button" class="btn btn-primary" id="' + id + 'Save">' + submitLabel + '</button>');
+        var header = $('&lt;div class="modal-header">');
+        var body = $('&lt;div class="modal-body">');
+        var footer = $('&lt;div class="modal-footer">');
+        var actionButton = $('&lt;button type="button" class="btn btn-primary" id="' + id + 'Save">' + submitLabel + '&lt;/button>');
 
-        header.append($('<button type="button" class="close" data-dismiss="modal" aria-label="Lukk"><span aria-hidden="true">&times;</span></button><h4 class="modal-title">' + headline + '</h4>'));
-        footer.append($('<button type="button" class="btn btn-default" data-dismiss="modal">' + dismissLabel + '</button>'));
+        header.append($('&lt;button type="button" class="close" data-dismiss="modal" aria-label="Lukk">&lt;span aria-hidden="true">&amp;times;&lt;/span>&lt;/button>&lt;h4 class="modal-title">' + headline + '&lt;/h4>'));
+        footer.append($('&lt;button type="button" class="btn btn-default" data-dismiss="modal">' + dismissLabel + '&lt;/button>'));
         footer.append(actionButton);
 
-        var modal = $('<div id="' + id + 'Modal" class="modal face" role="dialog">')
-            .append($('<div class="modal-dialog">')
-                .append($('<div class="modal-content">')
+        var modal = $('&lt;div id="' + id + 'Modal" class="modal face" role="dialog">')
+            .append($('&lt;div class="modal-dialog">')
+                .append($('&lt;div class="modal-content">')
                     .append(header)
                     .append(body)
                     .append(footer)
@@ -1028,12 +1056,12 @@ function TableCreator(data, el) {
             errors.constructor === Array ? errors : null;    // if array: itself, else: null
 
         if(!!errors) {
-            var errorDiv = $('<div class="panel panel-danger">');
-            errorDiv.append('<div class="panel-heading">Feil</div>');
-            var errorBody = $('<div class="panel-body"></div>');
+            var errorDiv = $('&lt;div class="panel panel-danger">');
+            errorDiv.append('&lt;div class="panel-heading">Feil&lt;/div>');
+            var errorBody = $('&lt;div class="panel-body">&lt;/div>');
             errorDiv.append(errorBody);
-            for(var i = 0; i < errors.length; ++i) {
-                var item = $('<p>');
+            for(var i = 0; i &lt; errors.length; ++i) {
+                var item = $('&lt;p>');
                 item.html(errors[i]);
                 errorBody.append(item);
             }
@@ -1105,7 +1133,7 @@ function TableCreator(data, el) {
         var settings = this.data.table;
         var html = '';
 
-        for(var i = 0; i < cols.length; ++i) {
+        for(var i = 0; i &lt; cols.length; ++i) {
             var id = cols[i].id;
             var title = cols[i].title;
             var type = cols[i].type;
@@ -1117,14 +1145,14 @@ function TableCreator(data, el) {
                 continue;
             }
 
-            html += '<div class="form-group row">';
+            html += '&lt;div class="form-group row">';
 
             if (type === 'number' || type === 'percent') {
-                html += '<label for="tcEdit_' + id + '" class="control-label col-md-7">' + title + '</label>';
-                html += '<div class="col-md-5">';
+                html += '&lt;label for="tcEdit_' + id + '" class="control-label col-md-7">' + title + '&lt;/label>';
+                html += '&lt;div class="col-md-5">';
             } else {
-                html += '<label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '</label>';
-                html += '<div class="col-md-8">';
+                html += '&lt;label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '&lt;/label>';
+                html += '&lt;div class="col-md-8">';
             }
 
             if (settings.hasOwnProperty("pool")) {
@@ -1144,45 +1172,45 @@ function TableCreator(data, el) {
                 default:
                 case 'undefined':
                 case 'string':
-                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '" value="' + (row[id] || "") + '"/>';
+                    html += '&lt;input type="text" class="form-control" name="tcEdit_' + id + '" value="' + (row[id] || "") + '"/>';
                     break;
                 case 'number':
                     var frac = Math.pow(10,settings.settings.decimals);
-                    html += '<input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
+                    html += '&lt;input type="number" class="form-control" step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
                     break;
                 case 'percent':
-                    html += '<input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
+                    html += '&lt;input type="number" class="form-control" step="0.1" name="tcEdit_' + id + '" value="' + row[id] + '" lang="nb"/>';
                     break;
                 case 'dropdown':
-                    html += '<select class="form-control" name="tcEdit_' + id + '">';
-                    for (var j = 0; j < pool.length; ++j) {
+                    html += '&lt;select class="form-control" name="tcEdit_' + id + '">';
+                    for (var j = 0; j &lt; pool.length; ++j) {
                         var selected = (this.decodeHtmlEntities(row[id]) === pool[j]) ? ' selected="selected"' : '';
-                        html += '<option' + selected + '>' + pool[j] + '</option>';
+                        html += '&lt;option' + selected + '>' + pool[j] + '&lt;/option>';
                     }
-                    html += '</select>';
+                    html += '&lt;/select>';
                     break;
                 case 'multichoice':
                     var isActive, active, checked;
-                    for (var k = 0; k < pool.length; ++k) {
+                    for (var k = 0; k &lt; pool.length; ++k) {
                         isActive = false;
                         if (row[id].constructor === Array) {
-                            for (var l = 0; l < row[id].length && !isActive; ++l) {
+                            for (var l = 0; l &lt; row[id].length &amp;&amp; !isActive; ++l) {
                                 if(this.decodeHtmlEntities(row[id][l]) === pool[k])
                                     isActive = true;
                             }
                         }
-                        else if (typeof row[id] === 'string' && row[id] === this.decodeHtmlEntities(pool[k])) {
+                        else if (typeof row[id] === 'string' &amp;&amp; row[id] === this.decodeHtmlEntities(pool[k])) {
                             isActive = true;
                         }
                         active = (isActive ? 'active' : '');
                         checked = (isActive ? ' checked' : '');
-                        html += '<div class="checkbox"><label class="' + active + '">'+
-                                    '<input type="checkbox"' + checked + ' name="tcEdit_' + id + '_' + k + '">' + pool[k] + '</label></div>';
+                        html += '&lt;div class="checkbox">&lt;label class="' + active + '">'+
+                                    '&lt;input type="checkbox"' + checked + ' name="tcEdit_' + id + '_' + k + '">' + pool[k] + '&lt;/label>&lt;/div>';
                     }
                     break;
             }
 
-            html += '</div></div>';
+            html += '&lt;/div>&lt;/div>';
         }
 
         return html;
@@ -1248,7 +1276,7 @@ function TableCreator(data, el) {
 
         var pool = null;
         if(hasCheckBox) {
-            pool = this.data && this.data.table && this.data.table.pool ? this.data.table.pool : null;
+            pool = this.data &amp;&amp; this.data.table &amp;&amp; this.data.table.pool ? this.data.table.pool : null;
         }
 
         var row = this.data.tbody[rowIdx];
@@ -1256,7 +1284,7 @@ function TableCreator(data, el) {
         var newValues = {};
         var valid = true;
         var checkboxId;
-        for (var x = 0; x < dictionary.length; ++x) {
+        for (var x = 0; x &lt; dictionary.length; ++x) {
             key = dictionary[x].key;
             value = dictionary[x].value;
             type = dictionary[x].hasOwnProperty("type") ? dictionary[x].type : null;
@@ -1332,9 +1360,9 @@ function TableCreator(data, el) {
         for (var y in oldValues) {
             if(oldValues.hasOwnProperty(y)) {
                 // multichoice
-                if (!!oldValues[y] && oldValues[y].constructor === Array) {
+                if (!!oldValues[y] &amp;&amp; oldValues[y].constructor === Array) {
                     newUndo[y] = newUndo[y] || [];
-                    for (var n = 0; n < oldValues[y].length; ++n) {
+                    for (var n = 0; n &lt; oldValues[y].length; ++n) {
                         newUndo[y][n] = this.decodeHtmlEntities(oldValues[y][n]);
                     }
                 }
@@ -1349,7 +1377,7 @@ function TableCreator(data, el) {
             if (newValues.hasOwnProperty(z)) {
                 if (newValues[z].constructor === Array) {
                     newRow[z] = newRow[z] || [];
-                    for (var o = 0; o < newValues[z].length; ++o) {
+                    for (var o = 0; o &lt; newValues[z].length; ++o) {
                         newRow[z][o] = this.decodeHtmlEntities(newValues[z][o]);
                     }
                 } else {
@@ -1382,16 +1410,16 @@ function TableCreator(data, el) {
             var modal = $('#EditModal');
             var errorDiv = $('#EditModal .errorDiv');
             if (errorDiv.length === 0) {
-                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                errorDiv = $('&lt;div class="errorDiv alert alert-danger">&lt;/div>');
                 modal.find('.modal-body').prepend(errorDiv);
             }
 
             switch(jqXHR.status) {
                 case 404:
-                    errorDiv.html('<p>Ikke lagret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
+                    errorDiv.html('&lt;p>Ikke lagret:&lt;/p>&lt;li>Finner ikke lagringsplass (feil 404).&lt;/li>');
                     break;
                 default:
-                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + '). Å laste siden på nytt vil kunne hjelpe (trykk F5 på tastaturet).</p>');
+                    errorDiv.html('&lt;p>Lagring ikke mulig (feil ' + jqXHR.status + '). Å laste siden på nytt vil kunne hjelpe (trykk F5 på tastaturet).&lt;/p>');
                     break;
             }
 
@@ -1423,27 +1451,27 @@ function TableCreator(data, el) {
         var modal = $(modalId);
         var errorDiv = modal.find('.errorDiv');
         if (errorDiv.length === 0) {
-            errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+            errorDiv = $('&lt;div class="errorDiv alert alert-danger">&lt;/div>');
             modal.find('.modal-body').prepend(errorDiv);
         }
 
         if(!!errorMessage) {
-            errorDiv.html('<p>' + errorMessage + '</p>');
+            errorDiv.html('&lt;p>' + errorMessage + '&lt;/p>');
         }
 
-        if(!!errorArray && errorArray.constructor === Array) {
-            for(var i = 0; i < errorArray.length; ++i)
-                errorDiv.append($('<li>' + errorArray[i] + '</li>'));
+        if(!!errorArray &amp;&amp; errorArray.constructor === Array) {
+            for(var i = 0; i &lt; errorArray.length; ++i)
+                errorDiv.append($('&lt;li>' + errorArray[i] + '&lt;/li>'));
         }
     };
 
     this.removeLastUndo = function(rowIdx) {
         var row = this.data.tbody[rowIdx];
-        if(row.hasOwnProperty('undo') && row.undo !== null) {
+        if(row.hasOwnProperty('undo') &amp;&amp; row.undo !== null) {
             var undoItem = row.undo;
             var remainingUndo = row.undo.undo;
             for (var property in undoItem) {
-                if (undoItem.hasOwnProperty(property) && property !== "undo") {
+                if (undoItem.hasOwnProperty(property) &amp;&amp; property !== "undo") {
                     row.property = undoItem.property;
                 }
             }
@@ -1492,7 +1520,7 @@ function TableCreator(data, el) {
         var ctx = this;
         var container = $("#UndoModal");
         var body = container.find('.modal-body');
-        body.html('<p>Angre og gå eit steg tilbake?</p>');
+        body.html('&lt;p>Angre og gå eit steg tilbake?&lt;/p>');
 
         if(!!errors) {
             body.prepend(this.displayErrorHelper(errors));
@@ -1518,13 +1546,13 @@ function TableCreator(data, el) {
 
         var requestObj = {};
         for (var prop in row) {
-            if(row.hasOwnProperty(prop) && prop !== "undo") {
+            if(row.hasOwnProperty(prop) &amp;&amp; prop !== "undo") {
                 requestObj[prop] = row[prop];
             }
         }
 
         for (var change in row.undo) {
-            if (row.undo.hasOwnProperty(change) && change !== "undo" && row.undo[change] !== null) {
+            if (row.undo.hasOwnProperty(change) &amp;&amp; change !== "undo" &amp;&amp; row.undo[change] !== null) {
                 requestObj[change] = row.undo[change];
             }
         }
@@ -1552,16 +1580,16 @@ function TableCreator(data, el) {
             var modal = $('#UndoModal');
             var errorDiv = $('#UndoModal .errorDiv');
             if (errorDiv.length === 0) {
-                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                errorDiv = $('&lt;div class="errorDiv alert alert-danger">&lt;/div>');
                 modal.find('.modal-body').prepend(errorDiv);
             }
 
             switch(response.status) {
                 case 404:
-                    errorDiv.html('<p>Fikk ikke angret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
+                    errorDiv.html('&lt;p>Fikk ikke angret:&lt;/p>&lt;li>Finner ikke lagringsplass (feil 404).&lt;/li>');
                     break;
                 default:
-                    errorDiv.html('<p>Angring ikke mulig (feil ' + response.status + ').</p>');
+                    errorDiv.html('&lt;p>Angring ikke mulig (feil ' + response.status + ').&lt;/p>');
                     break;
             }
         }
@@ -1705,8 +1733,8 @@ function TableCreator(data, el) {
         };
 
         var footer = container.find('.modal-footer');
-        footer.prepend($('<i class="fa fa-save fa-lg" style="margin-right: 1em;"></i>'));
-        footer.prepend($('<i class="fa fa-refresh fa-spin" style="margin-right: 1em;"></i>'));
+        footer.prepend($('&lt;i class="fa fa-save fa-lg" style="margin-right: 1em;">&lt;/i>'));
+        footer.prepend($('&lt;i class="fa fa-refresh fa-spin" style="margin-right: 1em;">&lt;/i>'));
 
         $.ajax({
             type: 'POST',
@@ -1724,16 +1752,16 @@ function TableCreator(data, el) {
             var modal = $('#EditModal');
             var errorDiv = modal.find('.errorDiv');
             if(errorDiv.length === 0) {
-                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                errorDiv = $('&lt;div class="errorDiv alert alert-danger">&lt;/div>');
                 modal.find('.modal-body').prepend(errorDiv);
             }
 
             switch (jqXHR.status) {
                 case 404:
-                    errorDiv.html('<p><b>Ikke lagret:</b> Finner ikke lagringsplass (feil 404).</p>');
+                    errorDiv.html('&lt;p>&lt;b>Ikke lagret:&lt;/b> Finner ikke lagringsplass (feil 404).&lt;/p>');
                     break;
                 default:
-                    errorDiv.html('<p><b>Ikke lagret:</b> Lagring ikke mulig (feil ' + jqXHR.status + ').</p>');
+                    errorDiv.html('&lt;p>&lt;b>Ikke lagret:&lt;/b> Lagring ikke mulig (feil ' + jqXHR.status + ').&lt;/p>');
                     break;
             }
 
@@ -1748,7 +1776,7 @@ function TableCreator(data, el) {
 
 
             if (data.Success !== true) {
-                var errors = (!!data.Errors && data.Errors.constructor === Array) ? data.Errors : null;
+                var errors = (!!data.Errors &amp;&amp; data.Errors.constructor === Array) ? data.Errors : null;
                 ctx.setModalError('#EditModal', data.Message, errors);
 
                 footer.find("i.fa-spin").fadeOut(500, function() { $(this).remove(); });
@@ -1772,26 +1800,26 @@ function TableCreator(data, el) {
             if (settings.template.hasOwnProperty("addTpl"))
                 template = settings.template.addTpl;
 
-        for (var i = 0; i < cols.length; ++i) {
+        for (var i = 0; i &lt; cols.length; ++i) {
             var id = cols[i].id;
             var title = cols[i].title;
             var type = cols[i].type;
             var pool = null;
             var hasMethod = cols[i].hasOwnProperty("method") ? true : false;
             var editable = cols[i].hasOwnProperty("editable") ? cols[i].editable : false;
-            var value = (template !== null && template.hasOwnProperty(id)) ? template[id] : null;
+            var value = (template !== null &amp;&amp; template.hasOwnProperty(id)) ? template[id] : null;
 
             if (hasMethod || type === 'method' || type === 'actionArray' || !editable) {
                 continue;
             }
 
-            html += '<div class="form-group row">';
-            html += '<label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '</label>';
+            html += '&lt;div class="form-group row">';
+            html += '&lt;label for="tcEdit_' + id + '" class="control-label col-md-4">' + title + '&lt;/label>';
 
             if (type === 'number') {
-                html += '<div class="col-md-push-3 col-md-5">';
+                html += '&lt;div class="col-md-push-3 col-md-5">';
             } else {
-                html += '<div class="col-md-8">';
+                html += '&lt;div class="col-md-8">';
             }
 
             if (settings.hasOwnProperty("pool")) {
@@ -1809,39 +1837,39 @@ function TableCreator(data, el) {
                 default:
                 case 'undefined':
                 case 'string':
-                    html += '<input type="text" class="form-control" name="tcEdit_' + id + '" ' + 
+                    html += '&lt;input type="text" class="form-control" name="tcEdit_' + id + '" ' + 
                         (value === null ? '' : 'value="' + value + '"' ) + '/>';
                     break;
                 case 'number':
                     var frac = Math.pow(10, settings.settings.decimals);
-                    html += '<input type="number" class="form-control" ' + 
+                    html += '&lt;input type="number" class="form-control" ' + 
                         'step="' + (frac?(1/frac):1) + '" name="tcEdit_' + id + '" ' + 
                         (value === null ? 'value="0"' : 'value="' + value + '"') + ' lang="nb"/>';
                     break;
                 case 'percent':
-                    html += '<input type="number" class="form-control" ' + 
+                    html += '&lt;input type="number" class="form-control" ' + 
                         'step="0.1" name="tcEdit_' + id + '"' + 
                         (value === null ? 'value="0"' : 'value="' + value + '"') + ' lang="nb"/>';
                     break;
                 case 'dropdown':
-                    html += '<select class="form-control" name="tcEdit_' + id + '">';
+                    html += '&lt;select class="form-control" name="tcEdit_' + id + '">';
                     var selected = (value !== null) ? ' selected' : '';
-                    html += '<option' + selected + ' disabled>Velg en...</option>';
-                    for (var j = 0; j < pool.length; ++j) {
+                    html += '&lt;option' + selected + ' disabled>Velg en...&lt;/option>';
+                    for (var j = 0; j &lt; pool.length; ++j) {
                         selected = (value === pool[j]) ? ' selected' : '';
-                        html += '<option' + selected + '>' + pool[j] + '</option>';
+                        html += '&lt;option' + selected + '>' + pool[j] + '&lt;/option>';
                     }
-                    html += '</select>';
+                    html += '&lt;/select>';
                     break;
                 case 'multichoice':
-                    for (var k = 0; k < pool.length; ++k) {
-                        html += '<div class="checkbox"><label><input type="checkbox" name="tcEdit_' + id + '_' + k + '">' +
-                            pool[k] + '</label></div>';
+                    for (var k = 0; k &lt; pool.length; ++k) {
+                        html += '&lt;div class="checkbox">&lt;label>&lt;input type="checkbox" name="tcEdit_' + id + '_' + k + '">' +
+                            pool[k] + '&lt;/label>&lt;/div>';
                     }
                     break;
             }
 
-            html += '</div></div>';
+            html += '&lt;/div>&lt;/div>';
         }
 
         return html;
@@ -1945,7 +1973,7 @@ function TableCreator(data, el) {
             row.isSaving = false;
             ctx.build().activate();
 
-            var errorMessage = "<p>Sletting ikke mulig (feil " + jqXHR.status + ").</p>";
+            var errorMessage = "&lt;p>Sletting ikke mulig (feil " + jqXHR.status + ").&lt;/p>";
             ctx.setModalError("#DeleteModal", errorMessage);
         }
     };
@@ -1973,7 +2001,7 @@ function TableCreator(data, el) {
         if (editButton.length === 0) {
             var commentLength = !!this.data ? !!this.data.table ? !!this.data.table.comment ? this.data.table.comment.length : 0 : 0 : 0;
             var actionCommand = commentLength > 0 ? "Endre" : "Legg til";
-            editButton = $('<a class="tcActionRow commentEdit" tabindex="0">' + actionCommand + ' kommentar</a>');
+            editButton = $('&lt;a class="tcActionRow commentEdit" tabindex="0">' + actionCommand + ' kommentar&lt;/a>');
             $(actionMenu).append(editButton);
         }
 
@@ -1989,7 +2017,7 @@ function TableCreator(data, el) {
         var container = $('#CommentModal');
         var body = container.find(".modal-body");
 
-        var commentArea = $('<textarea onkeyup="TableCreator.updateCommentEditor(this); return false;"></textarea>');
+        var commentArea = $('&lt;textarea onkeyup="TableCreator.updateCommentEditor(this); return false;">&lt;/textarea>');
 
         var comment = "";
         if(this.data.hasOwnProperty("table"))
@@ -1999,7 +2027,7 @@ function TableCreator(data, el) {
         commentArea.val(this.decodeHtmlEntities(comment));
 
         body.html(commentArea);
-        body.append($('<div class="charactersLeft"><span>check</span></div>'));
+        body.append($('&lt;div class="charactersLeft">&lt;span>check&lt;/span>&lt;/div>'));
 
         this.constructor.updateCommentEditor(commentArea.get(0));
 
@@ -2044,16 +2072,16 @@ function TableCreator(data, el) {
             var modal = $('#CommentModal');
             var errorDiv = $('#CommentModal .errorDiv');
             if (errorDiv.length === 0) {
-                errorDiv = $('<div class="errorDiv alert alert-danger"></div>');
+                errorDiv = $('&lt;div class="errorDiv alert alert-danger">&lt;/div>');
                 modal.find('.modal-body').prepend(errorDiv);
             }
 
             switch(jqXHR.status) {
                 case 404:
-                    errorDiv.html('<p>Ikke lagret:</p><li>Finner ikke lagringsplass (feil 404).</li>');
+                    errorDiv.html('&lt;p>Ikke lagret:&lt;/p>&lt;li>Finner ikke lagringsplass (feil 404).&lt;/li>');
                     break;
                 default:
-                    errorDiv.html('<p>Lagring ikke mulig (feil ' + jqXHR.status + ').</p>');
+                    errorDiv.html('&lt;p>Lagring ikke mulig (feil ' + jqXHR.status + ').&lt;/p>');
                     break;
             }
 
@@ -2093,15 +2121,15 @@ function TableCreator(data, el) {
         s = s.toString();
         // Licensed under MIT.
         // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
-        s = s.replace(/&#(\d+);?/g, function (_, code) {
+        s = s.replace(/&amp;#(\d+);?/g, function (_, code) {
             return String.fromCharCode(code);
         })
-        .replace(/&#[xX]([A-Fa-f0-9]+);?/g, function (_, hex) {
+        .replace(/&amp;#[xX]([A-Fa-f0-9]+);?/g, function (_, hex) {
             return String.fromCharCode(parseInt(hex, 16));
         })
-        .replace(/&([^;\W]+;?)/g, function (m, e) {
+        .replace(/&amp;([^;\W]+;?)/g, function (m, e) {
             var ee = e.replace(/;$/, '');
-            var target = ctx.ENTITIES[e] || (e.match(/;$/) && ctx.ENTITIES[ee]);
+            var target = ctx.ENTITIES[e] || (e.match(/;$/) &amp;&amp; ctx.ENTITIES[ee]);
 
             if (typeof target === 'number') {
                 return String.fromCharCode(target);
@@ -2120,15 +2148,15 @@ function TableCreator(data, el) {
         // Licensed under MIT.
         // Copyright (C) 2012-2014 JP Richardson jprichardson@gmail.com
         // https://github.com/jprichardson/string.js/blob/master/dist/string.js
-        amp: "&", gt: ">", lt: "<", quot: "\"", apos: "'", AElig: 198, Aacute: 193, Acirc: 194, Agrave: 192, Aring: 197, Atilde: 195, Auml: 196, Ccedil: 199, ETH: 208, Eacute: 201, Ecirc: 202, Egrave: 200, Euml: 203, Iacute: 205, Icirc: 206, Igrave: 204, Iuml: 207, Ntilde: 209, Oacute: 211, Ocirc: 212, Ograve: 210, Oslash: 216, Otilde: 213, Ouml: 214, THORN: 222, Uacute: 218, Ucirc: 219, Ugrave: 217, Uuml: 220, Yacute: 221, aacute: 225, acirc: 226, aelig: 230, agrave: 224, aring: 229, atilde: 227, auml: 228, ccedil: 231, eacute: 233, ecirc: 234, egrave: 232, eth: 240, euml: 235, iacute: 237, icirc: 238, igrave: 236, iuml: 239, ntilde: 241, oacute: 243, ocirc: 244, ograve: 242, oslash: 248, otilde: 245, ouml: 246, szlig: 223, thorn: 254, uacute: 250, ucirc: 251, ugrave: 249, uuml: 252, yacute: 253, yuml: 255, copy: 169, reg: 174, nbsp: 160, iexcl: 161, cent: 162, pound: 163, curren: 164, yen: 165, brvbar: 166, sect: 167, uml: 168, ordf: 170, laquo: 171, not: 172, shy: 173, macr: 175, deg: 176, plusmn: 177, sup1: 185, sup2: 178, sup3: 179, acute: 180, micro: 181, para: 182, middot: 183, cedil: 184, ordm: 186, raquo: 187, frac14: 188, frac12: 189, frac34: 190, iquest: 191, times: 215, divide: 247, "OElig;": 338, "oelig;": 339, "Scaron;": 352, "scaron;": 353, "Yuml;": 376, "fnof;": 402, "circ;": 710, "tilde;": 732, "Alpha;": 913, "Beta;": 914, "Gamma;": 915, "Delta;": 916, "Epsilon;": 917, "Zeta;": 918, "Eta;": 919, "Theta;": 920, "Iota;": 921, "Kappa;": 922, "Lambda;": 923, "Mu;": 924, "Nu;": 925, "Xi;": 926, "Omicron;": 927, "Pi;": 928, "Rho;": 929, "Sigma;": 931, "Tau;": 932, "Upsilon;": 933, "Phi;": 934, "Chi;": 935, "Psi;": 936, "Omega;": 937, "alpha;": 945, "beta;": 946, "gamma;": 947, "delta;": 948, "epsilon;": 949, "zeta;": 950, "eta;": 951, "theta;": 952, "iota;": 953, "kappa;": 954, "lambda;": 955, "mu;": 956, "nu;": 957, "xi;": 958, "omicron;": 959, "pi;": 960, "rho;": 961, "sigmaf;": 962, "sigma;": 963, "tau;": 964, "upsilon;": 965, "phi;": 966, "chi;": 967, "psi;": 968, "omega;": 969, "thetasym;": 977, "upsih;": 978, "piv;": 982, "ensp;": 8194, "emsp;": 8195, "thinsp;": 8201, "zwnj;": 8204, "zwj;": 8205, "lrm;": 8206, "rlm;": 8207, "ndash;": 8211, "mdash;": 8212, "lsquo;": 8216, "rsquo;": 8217, "sbquo;": 8218, "ldquo;": 8220, "rdquo;": 8221, "bdquo;": 8222, "dagger;": 8224, "Dagger;": 8225, "bull;": 8226, "hellip;": 8230, "permil;": 8240, "prime;": 8242, "Prime;": 8243, "lsaquo;": 8249, "rsaquo;": 8250, "oline;": 8254, "frasl;": 8260, "euro;": 8364, "image;": 8465, "weierp;": 8472, "real;": 8476, "trade;": 8482, "alefsym;": 8501, "larr;": 8592, "uarr;": 8593, "rarr;": 8594, "darr;": 8595, "harr;": 8596, "crarr;": 8629, "lArr;": 8656, "uArr;": 8657, "rArr;": 8658, "dArr;": 8659, "hArr;": 8660, "forall;": 8704, "part;": 8706, "exist;": 8707, "empty;": 8709, "nabla;": 8711, "isin;": 8712, "notin;": 8713, "ni;": 8715, "prod;": 8719, "sum;": 8721, "minus;": 8722, "lowast;": 8727, "radic;": 8730, "prop;": 8733, "infin;": 8734, "ang;": 8736, "and;": 8743, "or;": 8744, "cap;": 8745, "cup;": 8746, "int;": 8747, "there4;": 8756, "sim;": 8764, "cong;": 8773, "asymp;": 8776, "ne;": 8800, "equiv;": 8801, "le;": 8804, "ge;": 8805, "sub;": 8834, "sup;": 8835, "nsub;": 8836, "sube;": 8838, "supe;": 8839, "oplus;": 8853, "otimes;": 8855, "perp;": 8869, "sdot;": 8901, "lceil;": 8968, "rceil;": 8969, "lfloor;": 8970, "rfloor;": 8971, "lang;": 9001, "rang;": 9002, "loz;": 9674, "spades;": 9824, "clubs;": 9827, "hearts;": 9829, "diams;": 9830
+        amp: "&amp;", gt: ">", lt: "&lt;", quot: "\"", apos: "'", AElig: 198, Aacute: 193, Acirc: 194, Agrave: 192, Aring: 197, Atilde: 195, Auml: 196, Ccedil: 199, ETH: 208, Eacute: 201, Ecirc: 202, Egrave: 200, Euml: 203, Iacute: 205, Icirc: 206, Igrave: 204, Iuml: 207, Ntilde: 209, Oacute: 211, Ocirc: 212, Ograve: 210, Oslash: 216, Otilde: 213, Ouml: 214, THORN: 222, Uacute: 218, Ucirc: 219, Ugrave: 217, Uuml: 220, Yacute: 221, aacute: 225, acirc: 226, aelig: 230, agrave: 224, aring: 229, atilde: 227, auml: 228, ccedil: 231, eacute: 233, ecirc: 234, egrave: 232, eth: 240, euml: 235, iacute: 237, icirc: 238, igrave: 236, iuml: 239, ntilde: 241, oacute: 243, ocirc: 244, ograve: 242, oslash: 248, otilde: 245, ouml: 246, szlig: 223, thorn: 254, uacute: 250, ucirc: 251, ugrave: 249, uuml: 252, yacute: 253, yuml: 255, copy: 169, reg: 174, nbsp: 160, iexcl: 161, cent: 162, pound: 163, curren: 164, yen: 165, brvbar: 166, sect: 167, uml: 168, ordf: 170, laquo: 171, not: 172, shy: 173, macr: 175, deg: 176, plusmn: 177, sup1: 185, sup2: 178, sup3: 179, acute: 180, micro: 181, para: 182, middot: 183, cedil: 184, ordm: 186, raquo: 187, frac14: 188, frac12: 189, frac34: 190, iquest: 191, times: 215, divide: 247, "OElig;": 338, "oelig;": 339, "Scaron;": 352, "scaron;": 353, "Yuml;": 376, "fnof;": 402, "circ;": 710, "tilde;": 732, "Alpha;": 913, "Beta;": 914, "Gamma;": 915, "Delta;": 916, "Epsilon;": 917, "Zeta;": 918, "Eta;": 919, "Theta;": 920, "Iota;": 921, "Kappa;": 922, "Lambda;": 923, "Mu;": 924, "Nu;": 925, "Xi;": 926, "Omicron;": 927, "Pi;": 928, "Rho;": 929, "Sigma;": 931, "Tau;": 932, "Upsilon;": 933, "Phi;": 934, "Chi;": 935, "Psi;": 936, "Omega;": 937, "alpha;": 945, "beta;": 946, "gamma;": 947, "delta;": 948, "epsilon;": 949, "zeta;": 950, "eta;": 951, "theta;": 952, "iota;": 953, "kappa;": 954, "lambda;": 955, "mu;": 956, "nu;": 957, "xi;": 958, "omicron;": 959, "pi;": 960, "rho;": 961, "sigmaf;": 962, "sigma;": 963, "tau;": 964, "upsilon;": 965, "phi;": 966, "chi;": 967, "psi;": 968, "omega;": 969, "thetasym;": 977, "upsih;": 978, "piv;": 982, "ensp;": 8194, "emsp;": 8195, "thinsp;": 8201, "zwnj;": 8204, "zwj;": 8205, "lrm;": 8206, "rlm;": 8207, "ndash;": 8211, "mdash;": 8212, "lsquo;": 8216, "rsquo;": 8217, "sbquo;": 8218, "ldquo;": 8220, "rdquo;": 8221, "bdquo;": 8222, "dagger;": 8224, "Dagger;": 8225, "bull;": 8226, "hellip;": 8230, "permil;": 8240, "prime;": 8242, "Prime;": 8243, "lsaquo;": 8249, "rsaquo;": 8250, "oline;": 8254, "frasl;": 8260, "euro;": 8364, "image;": 8465, "weierp;": 8472, "real;": 8476, "trade;": 8482, "alefsym;": 8501, "larr;": 8592, "uarr;": 8593, "rarr;": 8594, "darr;": 8595, "harr;": 8596, "crarr;": 8629, "lArr;": 8656, "uArr;": 8657, "rArr;": 8658, "dArr;": 8659, "hArr;": 8660, "forall;": 8704, "part;": 8706, "exist;": 8707, "empty;": 8709, "nabla;": 8711, "isin;": 8712, "notin;": 8713, "ni;": 8715, "prod;": 8719, "sum;": 8721, "minus;": 8722, "lowast;": 8727, "radic;": 8730, "prop;": 8733, "infin;": 8734, "ang;": 8736, "and;": 8743, "or;": 8744, "cap;": 8745, "cup;": 8746, "int;": 8747, "there4;": 8756, "sim;": 8764, "cong;": 8773, "asymp;": 8776, "ne;": 8800, "equiv;": 8801, "le;": 8804, "ge;": 8805, "sub;": 8834, "sup;": 8835, "nsub;": 8836, "sube;": 8838, "supe;": 8839, "oplus;": 8853, "otimes;": 8855, "perp;": 8869, "sdot;": 8901, "lceil;": 8968, "rceil;": 8969, "lfloor;": 8970, "rfloor;": 8971, "lang;": 9001, "rang;": 9002, "loz;": 9674, "spades;": 9824, "clubs;": 9827, "hearts;": 9829, "diams;": 9830
     };
 
     this.callCallback = function (callbackObj) {
-        if (callbackObj && typeof callbackObj === 'object') {
+        if (callbackObj &amp;&amp; typeof callbackObj === 'object') {
             var fn = callbackObj.fn,
                 ctx = callbackObj.ctx;
 
-            if (typeof fn === 'function' && !!ctx) {
+            if (typeof fn === 'function' &amp;&amp; !!ctx) {
                 return fn.call(ctx);
             } else {
                 return fn.call({});
@@ -2161,7 +2189,7 @@ function TableCreator(data, el) {
 
         // compare each element
         var obj, tableObj;
-        for(var itr = 0; itr < inArray.length; ++itr) {
+        for(var itr = 0; itr &lt; inArray.length; ++itr) {
             obj = inArray[itr];
             tableObj = this.data.tbody[itr];
 
@@ -2238,3 +2266,26 @@ if(typeof window !== 'undefined') {
 } else if (typeof global !== 'undefined') {
     global.TableCreator = TableCreator;    
 }
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="TableCreator.html">TableCreator</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Fri Oct 30 2020 11:48:50 GMT+0100 (GMT+01:00)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
