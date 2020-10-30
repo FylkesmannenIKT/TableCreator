@@ -747,6 +747,12 @@ function TableCreator(data, el) {
             total *= (!args[arg] || /^\s*$/.test(args[arg])) ? 1 : args[arg];
         }
         return total;
+      },
+      "work_ratio" : function(args) {
+          if (args.reduce((result, arg) => result + arg, 0) === 0) {
+              return 100;
+          }
+          return this.div(args) * 100;
       }
     };
 
