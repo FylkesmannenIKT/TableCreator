@@ -25,8 +25,8 @@ describe('Empty insert', function(){
 describe('Values of zero', function(){
 	it('should be inserted normally', function() {
 		var rows = table.data.tbody.length;
-		table.insertRow({"stedligTilsyn_i_aar": 0});
-		var resultNumber = table.data.tbody.pop().stedligTilsyn_i_aar;
+		table.insertRow({"behandlet_innen_frist": 0});
+		var resultNumber = table.data.tbody.pop().behandlet_innen_frist;
 		expect(resultNumber).to.be.an.integer();
 	});
 });

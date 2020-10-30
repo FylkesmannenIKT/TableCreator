@@ -730,9 +730,12 @@ function TableCreator(data, el) {
         if (args.length === 0) return NaN;
         if (args.length === 1) return args[0];
         var dividend = parseFloat(args[0]);
-        for (var divisor = 1; divisor < args.length; ++divisor) {
-            // /= 1 if empty, undefined or whitespace
-            dividend /= (!args[divisor] || /^\s*$/.test(args[divisor])) ? 1 : args[divisor];
+        for (var index = 1; index < args.length; ++index) {
+            var divisor = parseFloat(args[index]);
+            if (divisor === 0 || isNaN(divisor)){
+                return NaN;
+            }
+            dividend /= divisor;
         }
         return dividend;
       },
@@ -744,6 +747,12 @@ function TableCreator(data, el) {
             total *= (!args[arg] || /^\s*$/.test(args[arg])) ? 1 : args[arg];
         }
         return total;
+      },
+      "work_ratio" : function(args) {
+          if (args.reduce((result, arg) => result + arg, 0) === 0) {
+              return 100;
+          }
+          return this.div(args) * 100;
       }
     };
 
@@ -912,8 +921,8 @@ function TableCreator(data, el) {
         if (typeof this.settings.precision === 'number')
             precision = this.settings.precision;
 
-        var value = parseFloat(argArrayStack.pop()).toFixed(precision);
-        value = isNaN(value) ? "" : value;
+        var value = parseFloat(argArrayStack.pop());
+        value = isNaN(value) ? "" : value.toFixed(precision);
         return value;
     };
 
