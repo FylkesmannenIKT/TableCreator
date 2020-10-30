@@ -730,9 +730,12 @@ function TableCreator(data, el) {
         if (args.length === 0) return NaN;
         if (args.length === 1) return args[0];
         var dividend = parseFloat(args[0]);
-        for (var divisor = 1; divisor < args.length; ++divisor) {
-            // /= 1 if empty, undefined or whitespace
-            dividend /= (!args[divisor] || /^\s*$/.test(args[divisor])) ? 1 : args[divisor];
+        for (var index = 1; index < args.length; ++index) {
+            var divisor = parseFloat(args[index]);
+            if (divisor === 0 || isNaN(divisor)){
+                return NaN;
+            }
+            dividend /= divisor;
         }
         return dividend;
       },
