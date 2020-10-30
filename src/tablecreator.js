@@ -749,7 +749,8 @@ function TableCreator(data, el) {
         return total;
       },
       "work_ratio" : function(args) {
-          if (args.reduce((result, arg) => result + arg, 0) === 0) {
+          var argumentSum = args.reduce(function (result, arg) { return result + arg }, 0);
+          if (argumentSum === 0) {
               return 100;
           }
           return this.div(args) * 100;
