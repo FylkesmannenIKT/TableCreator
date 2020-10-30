@@ -1,0 +1,68 @@
+{
+  "table": {
+    "id": "saksbehandlingstid_BOBY_ekspropriasjonssaker_som_klageinstans",
+    "pool": {},
+    "settings": {
+      "decimals": 0,
+      "isResizable": false
+    },
+    "datasource": {
+      "url": "https://sysam.fylkesmannen.no/Statistics/Api",
+      "caseTypeIdList": "26",
+      "fromDate": "2020-1-1",
+      "toDate": "2020-12-31",
+      "Name": "SYSAM Json Api"
+    },
+    "title": "Saksbehandlingstid i antall uker for ekspropriasjonssaker (klageinstans) på plan- og bygningsrettens område",
+    "schemaId": 260,
+    "instanceId": 1697,
+    "comment": "",
+    "template": {}
+  },
+  "thead": {
+    "rows": [],
+    "cols": [
+      {
+        "id": "resultatmaal",
+        "title": "Resultatmål",
+        "type": "percent",
+        "editable": false
+      },
+      {
+        "id": "differanse",
+        "title": "Differanse",
+        "type": "percent",
+        "method": "sum(-resultatmaal,resultat)",
+        "editable": false
+      },
+      {
+        "id": "resultat",
+        "title": "Oppnådd andel av totalt antall behandlede saker",
+        "type": "percent",
+        "method": "mult(div(behandlet_innen_frist,behandlede_saker),100)",
+        "editable": false
+      },
+      {
+        "id": "behandlede_saker",
+        "title": "Totalt antall behandlede saker",
+        "editable": true,
+        "databind": "NumCasesHandledInPeriod"
+      },
+      {
+        "id": "behandlet_innen_frist",
+        "title": "Antall behandlede saker innen 12 uker",
+        "editable": true,
+        "databind": "NumCasesHandledWithinTimelimit"
+      }
+    ]
+  },
+  "tfoot": {
+    "rows": [],
+    "cols": []
+  },
+  "tbody": [
+    {
+      "resultatmaal": 100
+    }
+  ]
+}
