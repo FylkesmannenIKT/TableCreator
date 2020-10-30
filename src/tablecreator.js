@@ -915,8 +915,8 @@ function TableCreator(data, el) {
         if (typeof this.settings.precision === 'number')
             precision = this.settings.precision;
 
-        var value = parseFloat(argArrayStack.pop()).toFixed(precision);
-        value = isNaN(value) ? "" : value;
+        var value = parseFloat(argArrayStack.pop());
+        value = isNaN(value) ? "" : value.toFixed(precision);
         return value;
     };
 
